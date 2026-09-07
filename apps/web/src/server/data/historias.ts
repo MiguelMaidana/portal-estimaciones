@@ -22,6 +22,10 @@ export class HistoriaMemoryRepository implements HistoriaRepository {
   async obtenerPorId(id: string): Promise<HistoriaRecord | null> {
     return this.items.get(id) ?? null;
   }
+
+  async listar(): Promise<HistoriaRecord[]> {
+    return Array.from(this.items.values());
+  }
 }
 
 export function crearHistoriaRepositoryMemoria(): HistoriaRepository {

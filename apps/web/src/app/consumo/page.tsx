@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { appContext } from "../../server/app-context";
+import { Card } from "../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../server/auth/resolve-identity";
 
 function periodoActual() {
@@ -22,12 +23,49 @@ export default async function ConsumoPage() {
 
   return (
     <main>
-      <h1>Consumo</h1>
-      <p>Cliente: {clienteId}</p>
-      <p>Periodo: {periodo}</p>
-      <p>Linea base: {lineaBase}</p>
-      <p>Consumido: {consumido}</p>
-      <p>Disponible: {disponible}</p>
+      <section className="page-hero">
+        <span className="pill pill-blue">Consumo</span>
+        <h1>Linea base mensual</h1>
+        <p>La visualizacion del consumo resume cuanto queda disponible para el cliente activo en el periodo seleccionado.</p>
+      </section>
+      <div className="page-grid">
+        <Card>
+          <div className="metric-grid">
+            <div className="metric">
+              <div className="metric-label">Linea base</div>
+              <div className="metric-value">{lineaBase}</div>
+            </div>
+            <div className="metric">
+              <div className="metric-label">Consumido</div>
+              <div className="metric-value">{consumido}</div>
+            </div>
+            <div className="metric">
+              <div className="metric-label">Disponible</div>
+              <div className="metric-value">{disponible}</div>
+            </div>
+          </div>
+        </Card>
+        <div className="section-stack">
+          <Card>
+            <h2>Contexto</h2>
+            <div className="summary-list">
+              <div className="summary-row">
+                <span>Cliente</span>
+                <strong>{clienteId}</strong>
+              </div>
+              <div className="summary-row">
+                <span>Periodo</span>
+                <strong>{periodo}</strong>
+              </div>
+            </div>
+          </Card>
+          <Card>
+            <div className="info-banner">
+              El descuento de linea base ocurre solo cuando una historia se acepta.
+            </div>
+          </Card>
+        </div>
+      </div>
     </main>
   );
 }

@@ -31,6 +31,7 @@ export interface HistoriaRepository {
   crear(input: HistoriaRecord): Promise<HistoriaRecord>;
   actualizar(id: string, patch: Partial<HistoriaRecord>): Promise<HistoriaRecord>;
   obtenerPorId(id: string): Promise<HistoriaRecord | null>;
+  listar(): Promise<HistoriaRecord[]>;
 }
 
 export interface MatrizRepository {

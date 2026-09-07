@@ -126,7 +126,7 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
       {demoMode ? <p className="story-note">Modo demo activo: la API usa headers de desarrollo.</p> : null}
       {createdId ? (
         <p className="story-message">
-          <Link href={`/historias/${createdId}`}>Ver historia creada</Link>
+          <Link href={`/historias/${createdId}${demoMode ? "?demo=1" : ""}`}>Ver historia creada</Link>
         </p>
       ) : null}
       {message ? <p className="story-message">{message}</p> : null}
