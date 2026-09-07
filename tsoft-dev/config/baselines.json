@@ -1,0 +1,19 @@
+{
+  "_comentario": "Clasificacion de tipo de tarea y complejidad. No hay formula de horas-hombre en el kit: se descarto a proposito porque no hay forma no sesgada de saber cuanto tardaria una tarea a mano en un equipo que ya trabaja con el kit desde el dia 0 (ver decision del 2026-08-27). tipo_tarea/complejidad quedan como metadato descriptivo para agrupar consumo/costo por tipo de trabajo, no para prometer un ahorro en horas.",
+  "tipo_default": "evolutivo-frontend",
+  "tipos_validos": [
+    "evolutivo-backend",
+    "evolutivo-frontend",
+    "evolutivo-fullstack",
+    "mantenimiento-correctivo",
+    "refactor",
+    "analisis",
+    "documentacion",
+    "devops",
+    "pruebas"
+  ],
+  "umbrales_complejidad": {
+    "media": 4,
+    "alta": 12
+  }
+}

@@ -1,0 +1,11 @@
+export interface ClienteSeed {
+  nombre: string;
+  servicio: string;
+  lineaBasePuntos: number;
+}
+
+export const clienteDemoSeed: ClienteSeed = {
+  nombre: "DEMO",
+  servicio: "DEMO",
+  lineaBasePuntos: 100
+};

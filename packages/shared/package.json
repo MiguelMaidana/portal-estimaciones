@@ -1,0 +1,13 @@
+{
+  "name": "@portal-estimaciones/shared",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"lint pending\"",
+    "test": "echo \"tests pending\""
+  },
+  "dependencies": {
+    "zod": "^3.24.1"
+  }
+}

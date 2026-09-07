@@ -1,0 +1,17 @@
+{
+  "name": "portal-estimaciones",
+  "private": true,
+  "version": "0.1.0",
+  "devDependencies": {
+    "@types/node": "^24.3.1",
+    "@types/react": "^19.1.9",
+    "@types/react-dom": "^19.1.7",
+    "typescript": "^5.9.2"
+  },
+  "scripts": {
+    "typecheck": "pnpm -r typecheck",
+    "lint": "pnpm -r lint",
+    "test": "pnpm -r test",
+    "dev": "pnpm --filter @portal-estimaciones/web dev"
+  }
+}

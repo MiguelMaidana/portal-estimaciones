@@ -1,0 +1,20 @@
+{
+  "pesos": {
+    "complejidad_tecnica": {
+      "baja": 1,
+      "media": 3,
+      "alta": 5
+    },
+    "por_integracion_detectada": 2,
+    "por_ambiguedad_detectada": 1,
+    "por_dependencia_externa": 2,
+    "por_criterio_aceptacion": 0.5
+  },
+  "umbrales_tamano": [
+    { "tamano": "XS", "puntos_max": 3 },
+    { "tamano": "S", "puntos_max": 6 },
+    { "tamano": "M", "puntos_max": 10 },
+    { "tamano": "L", "puntos_max": 16 },
+    { "tamano": "XL", "puntos_max": null }
+  ]
+}

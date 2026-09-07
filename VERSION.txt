@@ -1,0 +1,12 @@
+TSOFT AI Dev Kit
+Version : 2026-08-30
+Commit  : a3eb2d1
+Armado  : 2026-08-30 16:35:02
+
+Este paquete se genero con empaquetar.ps1 desde git archive, no copiando
+carpetas. Su contenido es identico al commit indicado arriba.
+
+Verificado: sin CRLF en archivos que lee Python, sin BOM, sin mojibake,
+frontmatter de skills valido, hooks compilan, tests en verde.
+
+Instalacion:  ver MANUAL-DEV.md

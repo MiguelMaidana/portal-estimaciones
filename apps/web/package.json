@@ -1,0 +1,20 @@
+{
+  "name": "@portal-estimaciones/web",
+  "private": true,
+  "version": "0.1.0",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "lint": "echo \"lint pending\"",
+    "test": "echo \"tests pending\""
+  },
+  "dependencies": {
+    "@portal-estimaciones/quality-agent": "workspace:*",
+    "@portal-estimaciones/shared": "workspace:*",
+    "@portal-estimaciones/sizing-engine": "workspace:*",
+    "next": "^15.4.6",
+    "react": "^19.1.1",
+    "react-dom": "^19.1.1"
+  }
+}

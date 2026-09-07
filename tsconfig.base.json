@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["ES2022", "DOM"],
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "noEmit": true,
+    "allowJs": false,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "skipLibCheck": true,
+    "resolveJsonModule": true,
+    "baseUrl": ".",
+    "paths": {
+      "@portal-estimaciones/shared": ["packages/shared/src/index.ts"],
+      "@portal-estimaciones/quality-agent": ["packages/quality-agent/src/index.ts"],
+      "@portal-estimaciones/sizing-engine": ["packages/sizing-engine/src/index.ts"]
+    }
+  }
+}

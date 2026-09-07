@@ -1,0 +1,22 @@
+{
+  "nombre": "TSOFT AI Dev Kit",
+  "organizacion": "TSOFT",
+  "version": "1.0.0",
+
+  "_comentario_moneda": "Moneda local del equipo y su tipo de cambio contra el dolar. AJUSTAR: cada servicio pone la suya. Si se deja el tipo de cambio en 0 los reportes muestran solo USD.",
+  "moneda_local": "ARS",
+  "usd_a_moneda_local": 1500,
+  "_comentario_umbral_inactividad": "Minutos sin actividad que el reconciliador (tiempo_activo(), reconciliador.py) descarta como pausa en vez de trabajo activo. AJUSTAR: si el equipo suele dejar sesiones abiertas mas tiempo (almuerzo, reuniones largas), subirlo evita descontar ese hueco como si fuera atencion real.",
+  "umbral_inactividad_min": 30,
+
+  "_comentario_consolidado_automatico": "Si es true, el hook Stop regenera el consolidado (generar_consolidado) en cada turno ademas del reporte de la sesion. AJUSTAR: ponerlo en false reduce el costo del hook Stop en sesiones largas (relee el ledger completo cada vez); el consolidado se puede generar aparte con reporte.py.",
+  "consolidado_automatico": true,
+
+  "_comentario_precios": "Precios en USD por 1.000.000 de tokens. Verificados contra documentacion oficial de OpenAI el 2026-07-29 para procesamiento estandar.",
+  "precios_usd_por_millon": {
+    "gpt-5.4":      { "input": 2.50, "cache": 0.25,  "output": 15.00 },
+    "gpt-5.4-mini": { "input": 0.75, "cache": 0.075, "output": 4.50 },
+    "gpt-4o-mini":  { "input": 0.15, "cache": 0.075, "output": 0.60 },
+    "_default":     { "input": 0,    "cache": 0,     "output": 0 }
+  }
+}

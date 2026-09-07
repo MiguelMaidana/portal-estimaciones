@@ -1,0 +1,9 @@
+:root {
+  --color-azul: #2c5282;
+  --color-amarillo: #f5a524;
+  --color-verde: #16a37a;
+  --color-rojo-oscuro: #a11820;
+  --color-rojo-tsoft: #e30613;
+  --font-ui: Calibri, Inter, Arial, sans-serif;
+  --font-mono: "JetBrains Mono", Consolas, monospace;
+}
