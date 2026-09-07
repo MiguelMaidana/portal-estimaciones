@@ -7,5 +7,5 @@ export interface ClienteSeed {
 export const clienteDemoSeed: ClienteSeed = {
   nombre: "DEMO",
   servicio: "DEMO",
-  lineaBasePuntos: 100
+  lineaBasePuntos: Number(process.env.DEMO_LINEA_BASE_PUNTOS ?? "100")
 };

@@ -25,7 +25,8 @@ export async function POST(
         identity,
         historias: appContext.historias,
         consumo: appContext.consumo,
-        auditoria: appContext.auditoria
+        auditoria: appContext.auditoria,
+        lineaBasePuntos: Number(process.env.DEMO_LINEA_BASE_PUNTOS ?? "100")
       }
     );
 

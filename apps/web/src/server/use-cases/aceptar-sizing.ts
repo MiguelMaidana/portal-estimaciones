@@ -14,6 +14,7 @@ export interface AceptarSizingDeps {
   historias: HistoriaRepository;
   consumo: ConsumoMemoryRepository;
   auditoria: RepositorioAuditoria;
+  lineaBasePuntos: number;
 }
 
 export async function aceptarSizing(input: AceptarSizingInput, deps: AceptarSizingDeps): Promise<void> {
@@ -34,9 +35,13 @@ export async function aceptarSizing(input: AceptarSizingInput, deps: AceptarSizi
     ? transicionarEstado(historia.estado, "ACEPTAR")
     : transicionarEstado(historia.estado, "RECHAZAR");
 
-  const lineaBase = 100;
   if (input.aceptado) {
-    await deps.consumo.ajustar(historia.clienteId, input.periodo, lineaBase, historia.puntosCalculados ?? 0);
+    await deps.consumo.ajustar(
+      historia.clienteId,
+      input.periodo,
+      deps.lineaBasePuntos,
+      historia.puntosCalculados ?? 0
+    );
   }
 
   await deps.auditoria.registrar({

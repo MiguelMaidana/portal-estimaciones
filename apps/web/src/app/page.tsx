@@ -1,8 +1,12 @@
-export default function HomePage() {
-  return (
-    <main>
-      <h1>Portal Estimaciones</h1>
-      <p>POC standalone para estimar historias de usuario con IA.</p>
-    </main>
-  );
+import { redirect } from "next/navigation";
+import { resolveIdentityFromCurrentSession } from "../server/auth/resolve-identity";
+
+export default async function HomePage() {
+  const identity = await resolveIdentityFromCurrentSession();
+
+  if (!identity) {
+    redirect("/login");
+  }
+
+  redirect(identity.rol === "lider" ? "/lider" : "/historias/nueva");
 }

@@ -18,4 +18,5 @@ tsoft-dev/metrics/
 tsoft-dev/reportes/
 
 *.log
+*.tsbuildinfo
 .DS_Store

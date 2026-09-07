@@ -8,6 +8,7 @@ import { ConsumoMemoryRepository } from "./data/consumo";
 import { HistoriaMemoryRepository } from "./data/historias";
 import { MatrizMemoryRepository } from "./data/matrices";
 import { UsuarioMemoryRepository } from "./data/usuarios";
+import { unauthorized } from "./http/errors";
 import type { CalidadPort, RepositorioAuditoria, SessionIdentity, SizingPort } from "./use-cases/contracts";
 
 class LocalQualityPort implements CalidadPort {
@@ -94,7 +95,7 @@ export async function resolveAppIdentity(request: Request) {
       return { userId, rol, clienteId };
     }
 
-    throw new Error("Unauthorized");
+    throw unauthorized("Unauthorized");
   }
 }
 
