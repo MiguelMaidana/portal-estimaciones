@@ -130,16 +130,16 @@ export async function resolveIdentityFromRequest(request: Request): Promise<Sess
 }
 
 export async function resolveIdentityFromCurrentSession(): Promise<SessionIdentity | null> {
-  const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.auth.getUser();
+  try {
+    const supabase = await createSupabaseServerClient();
+    const { data, error } = await supabase.auth.getUser();
 
-  if (error) {
-    throw unauthorized(error.message);
-  }
+    if (error || !data.user) {
+      return null;
+    }
 
-  if (!data.user) {
+    return resolveIdentityByUserId(data.user.id);
+  } catch {
     return null;
   }
-
-  return resolveIdentityByUserId(data.user.id);
 }
