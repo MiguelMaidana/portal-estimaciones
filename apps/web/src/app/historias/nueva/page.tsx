@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 import { NuevaHistoriaForm } from "../../../components/historias/NuevaHistoriaForm";
-import { Card } from "../../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../../server/auth/resolve-identity";
 import { DEMO_CLIENT_ID } from "../../../server/demo";
 
@@ -34,43 +33,7 @@ export default async function NuevaHistoriaPage({
         <h1>Nueva historia</h1>
         <p>Redacta una historia, adjunta imagenes si hace falta y deja que el flujo la lleve a calidad, sizing y validacion.</p>
       </section>
-      <div className="page-grid">
-        <Card>
-          <NuevaHistoriaForm demoMode={demoMode} clienteId={clienteId} />
-        </Card>
-        <div className="section-stack">
-          <Card>
-            <h2>Reglas de la carga</h2>
-            <div className="summary-list">
-              <div className="summary-row">
-                <span>Entrada</span>
-                <strong>Una historia a la vez</strong>
-              </div>
-              <div className="summary-row">
-                <span>OCR</span>
-                <strong>Best effort con revision manual</strong>
-              </div>
-              <div className="summary-row">
-                <span>Salida</span>
-                <strong>Estado inicial del analisis</strong>
-              </div>
-            </div>
-          </Card>
-          <Card>
-            <h2>Estados clave</h2>
-            <div className="summary-list">
-              <div className="summary-row">
-                <span>Calidad</span>
-                <strong>Completa o incompleta</strong>
-              </div>
-              <div className="summary-row">
-                <span>Sizing</span>
-                <strong>Solo si la historia está completa</strong>
-              </div>
-            </div>
-          </Card>
-        </div>
-      </div>
+      <NuevaHistoriaForm demoMode={demoMode} clienteId={clienteId} />
     </main>
   );
 }

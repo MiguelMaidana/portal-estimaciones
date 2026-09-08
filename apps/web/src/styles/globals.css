@@ -278,6 +278,38 @@ main {
   gap: 14px;
 }
 
+.story-workbench,
+.review-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.25fr) minmax(300px, 0.72fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.story-workbench {
+  margin-top: 8px;
+}
+
+.story-workbench-main,
+.review-main,
+.review-side {
+  display: grid;
+  gap: 16px;
+}
+
+.story-workbench-side,
+.review-side {
+  display: grid;
+  gap: 16px;
+}
+
+@media (max-width: 1024px) {
+  .story-workbench,
+  .review-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
 .login-form,
 .story-form {
   margin-top: 6px;
@@ -311,6 +343,10 @@ select {
 .story-textarea {
   resize: vertical;
   min-height: 120px;
+}
+
+.story-form .story-button {
+  width: 100%;
 }
 
 .story-input:focus,
@@ -643,6 +679,178 @@ input[type="file"]:focus {
   margin: 0;
   line-height: 1.6;
   color: #0f172a;
+}
+
+.review-summary-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+@media (max-width: 720px) {
+  .review-summary-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+.review-metric {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.94);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 4px 0 rgba(44, 82, 130, 0.12);
+}
+
+.review-id {
+  word-break: break-word;
+  font-size: 0.98rem;
+}
+
+.signal-banner {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  background: rgba(248, 250, 252, 0.94);
+}
+
+.signal-banner strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.signal-banner span {
+  color: rgba(15, 23, 42, 0.7);
+}
+
+.signal-dot {
+  width: 18px;
+  height: 18px;
+  margin-top: 4px;
+  border-radius: 999px;
+  background: var(--color-amarillo);
+  box-shadow: 0 0 0 6px rgba(245, 165, 36, 0.14);
+}
+
+.signal-banner--rojo .signal-dot {
+  background: var(--color-rojo-oscuro);
+  box-shadow: 0 0 0 6px rgba(161, 24, 32, 0.12);
+}
+
+.signal-banner--amber .signal-dot {
+  background: var(--color-amarillo);
+}
+
+.signal-banner--blue .signal-dot {
+  background: var(--color-azul);
+  box-shadow: 0 0 0 6px rgba(44, 82, 130, 0.12);
+}
+
+.signal-banner--green .signal-dot {
+  background: var(--color-verde);
+  box-shadow: 0 0 0 6px rgba(22, 163, 122, 0.12);
+}
+
+.signal-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.signal-grid--compact {
+  grid-template-columns: 1fr;
+}
+
+.signal-card {
+  display: grid;
+  gap: 6px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: inset 0 4px 0 rgba(44, 82, 130, 0.08);
+}
+
+.signal-card span {
+  color: rgba(15, 23, 42, 0.58);
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.signal-card strong {
+  font-size: 1.02rem;
+}
+
+.signal-card p {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.7);
+  line-height: 1.45;
+}
+
+.signal-card--rojo {
+  border-color: rgba(161, 24, 32, 0.2);
+  background: rgba(161, 24, 32, 0.06);
+}
+
+.signal-card--amber {
+  border-color: rgba(245, 165, 36, 0.22);
+  background: rgba(245, 165, 36, 0.08);
+}
+
+.signal-card--blue {
+  border-color: rgba(44, 82, 130, 0.18);
+  background: rgba(44, 82, 130, 0.06);
+}
+
+.signal-card--green {
+  border-color: rgba(22, 163, 122, 0.2);
+  background: rgba(22, 163, 122, 0.06);
+}
+
+.flow-mini {
+  display: grid;
+  gap: 12px;
+}
+
+.flow-mini-step {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  gap: 14px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(248, 250, 252, 0.95);
+  border: 1px solid rgba(15, 23, 42, 0.08);
+}
+
+.flow-mini-step > span {
+  width: 38px;
+  height: 38px;
+  display: grid;
+  place-items: center;
+  border-radius: 12px;
+  font-weight: 800;
+  color: white;
+  background: linear-gradient(135deg, var(--color-azul), #18304d);
+}
+
+.flow-mini-step strong {
+  display: block;
+  margin-bottom: 4px;
+}
+
+.flow-mini-step p {
+  margin: 0;
+  color: rgba(15, 23, 42, 0.68);
+}
+
+.summary-list--tight .summary-row {
+  align-items: center;
 }
 
 .empty-state {

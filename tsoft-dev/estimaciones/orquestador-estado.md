@@ -1,5 +1,5 @@
 # Estado del flujo - estimaciones
-Ultima actualizacion: 2026-09-07 19:33
+Ultima actualizacion: 2026-09-08 09:41
 
 ## Resumen
 Feature: estimaciones
@@ -29,6 +29,8 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - El demo queda alineado a `DEMO_CLIENT_ID = 11111111-1111-1111-1111-111111111111` para no romper la FK de `cliente`.
 - La migracion `supabase/migrations/0001_estimaciones.sql` ya incluye schema, indices, RLS y seed minimo de `DEMO` + matriz inicial.
 - Typecheck de workspace ejecutado y aprobado despues del cambio de persistencia.
+- Se re-tradujeron las pantallas de nueva historia y detalle hacia un layout de evaluacion con semaforo tecnico, sizing visible y panel lateral de acciones.
+- Se valido el redisenio con `pnpm --filter @portal-estimaciones/web build`.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.

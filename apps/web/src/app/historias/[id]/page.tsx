@@ -20,31 +20,31 @@ const FLOW_STAGES: FlowStage[] = [
   {
     title: "Carga",
     states: ["BORRADOR", "EN_ANALISIS_COMPLETITUD", "INCOMPLETA"],
-    hint: "Captura de texto y revisión de calidad.",
+    hint: "Captura de texto y revision de calidad.",
     action: "Completar o reenviar la historia."
   },
   {
     title: "Calidad",
     states: ["COMPLETA"],
-    hint: "La historia ya cumple el umbral mínimo.",
+    hint: "La historia ya cumple el umbral minimo.",
     action: "Ir a calcular sizing."
   },
   {
     title: "Sizing",
     states: ["EN_SIZING", "SIZING_CALCULADO"],
-    hint: "Extracción de criterios y cálculo determinístico.",
-    action: "Validación del líder."
+    hint: "Extraccion de criterios y calculo deterministico.",
+    action: "Validacion del lider."
   },
   {
-    title: "Líder",
+    title: "Lider",
     states: ["PENDIENTE_VALIDACION_LIDER", "SIZING_VALIDADO"],
-    hint: "Aprobación o corrección del sizing.",
+    hint: "Aprobacion o correccion del sizing.",
     action: "Publicar al cliente."
   },
   {
     title: "Cliente",
     states: ["PENDIENTE_ACEPTACION_CLIENTE", "RECHAZADA_POR_CLIENTE", "ACEPTADA", "EN_EJECUCION", "ENTREGADA"],
-    hint: "Aceptación final, ejecución y entrega.",
+    hint: "Aceptacion final, ejecucion y entrega.",
     action: "Aceptar y descontar consumo."
   }
 ];
@@ -57,8 +57,8 @@ function estadoActual(indicado: HistoriaEstado) {
 function siguientePaso(estado: HistoriaEstado) {
   if (estado === "BORRADOR" || estado === "EN_ANALISIS_COMPLETITUD") {
     return {
-      title: "Esperando evaluación de calidad",
-      description: "La historia todavía no quedó lista para sizing.",
+      title: "Esperando evaluacion de calidad",
+      description: "La historia todavia no quedo lista para sizing.",
       cta: "Volver a la carga"
     };
   }
@@ -66,7 +66,7 @@ function siguientePaso(estado: HistoriaEstado) {
   if (estado === "INCOMPLETA") {
     return {
       title: "Reenviar historia",
-      description: "La calidad no pasó el umbral mínimo. Corrige el texto y vuelve a enviar.",
+      description: "La calidad no paso el umbral minimo. Corrige el texto y vuelve a enviar.",
       cta: "Reenviar historia"
     };
   }
@@ -74,23 +74,23 @@ function siguientePaso(estado: HistoriaEstado) {
   if (estado === "COMPLETA") {
     return {
       title: "Calcular sizing",
-      description: "La historia está lista para extraer criterios y calcular tamaño.",
+      description: "La historia esta lista para extraer criterios y calcular tamano.",
       cta: "Ir a acciones"
     };
   }
 
   if (estado === "EN_SIZING" || estado === "SIZING_CALCULADO") {
     return {
-      title: "Validación del líder",
-      description: "El sizing ya fue calculado. Falta la revisión humana obligatoria.",
+      title: "Validacion del lider",
+      description: "El sizing ya fue calculado. Falta la revision humana obligatoria.",
       cta: "Abrir acciones"
     };
   }
 
   if (estado === "PENDIENTE_VALIDACION_LIDER") {
     return {
-      title: "Revisión del líder",
-      description: "La historia espera aprobación o corrección antes de mostrarse al cliente.",
+      title: "Revision del lider",
+      description: "La historia espera aprobacion o correccion antes de mostrarse al cliente.",
       cta: "Validar sizing"
     };
   }
@@ -98,7 +98,7 @@ function siguientePaso(estado: HistoriaEstado) {
   if (estado === "SIZING_VALIDADO" || estado === "PENDIENTE_ACEPTACION_CLIENTE") {
     return {
       title: "Aceptar por cliente",
-      description: "El resultado ya puede ser publicado para aceptación final.",
+      description: "El resultado ya puede ser publicado para aceptacion final.",
       cta: "Aceptar o rechazar"
     };
   }
@@ -106,16 +106,74 @@ function siguientePaso(estado: HistoriaEstado) {
   if (estado === "ACEPTADA" || estado === "EN_EJECUCION") {
     return {
       title: "Cerrar entrega",
-      description: "La historia ya fue aceptada y sólo resta la entrega operativa.",
+      description: "La historia ya fue aceptada y solo resta la entrega operativa.",
       cta: "Entregar"
     };
   }
 
   return {
     title: "Estado final",
-    description: "No hay una acción inmediata pendiente para este registro.",
+    description: "No hay una accion inmediata pendiente para este registro.",
     cta: "Volver al inicio"
   };
+}
+
+function resumenSemaforo(estado: HistoriaEstado) {
+  if (estado === "INCOMPLETA" || estado === "BORRADOR" || estado === "EN_ANALISIS_COMPLETITUD") {
+    return {
+      tone: "rojo",
+      titulo: "Aun no pasa el filtro de calidad",
+      descripcion: "Primero hay que completar la historia y resolver observaciones."
+    };
+  }
+
+  if (estado === "COMPLETA" || estado === "EN_SIZING") {
+    return {
+      tone: "amber",
+      titulo: "Lista para sizing",
+      descripcion: "La compuerta de calidad ya quedo abierta y ahora entra el calculo deterministico."
+    };
+  }
+
+  if (estado === "SIZING_CALCULADO" || estado === "PENDIENTE_VALIDACION_LIDER" || estado === "SIZING_VALIDADO") {
+    return {
+      tone: "blue",
+      titulo: "Sizing calculado y en revision",
+      descripcion: "Ya existe una estimacion, pero aun falta aprobacion o ajuste del lider."
+    };
+  }
+
+  return {
+    tone: "green",
+    titulo: "Flujo encaminado",
+    descripcion: "La historia ya paso la etapa tecnica y avanza a aceptacion o cierre."
+  };
+}
+
+function etiquetaEstado(estado: HistoriaEstado) {
+  if (estado === "PENDIENTE_VALIDACION_LIDER") return "pill pill-amber";
+  if (estado === "ACEPTADA" || estado === "ENTREGADA" || estado === "SIZING_VALIDADO") return "pill pill-green";
+  return "pill pill-blue";
+}
+
+function formatState(estado: HistoriaEstado) {
+  if (estado === "PENDIENTE_VALIDACION_LIDER") {
+    return "Listo para revisar";
+  }
+
+  if (estado === "SIZING_VALIDADO") {
+    return "Validado";
+  }
+
+  if (estado === "COMPLETA") {
+    return "Listo para sizing";
+  }
+
+  if (estado === "EN_SIZING") {
+    return "Calculando sizing";
+  }
+
+  return estado;
 }
 
 export default async function HistoriaDetallePage({
@@ -148,39 +206,48 @@ export default async function HistoriaDetallePage({
 
   const pasoActual = estadoActual(historia.estado);
   const pasoSiguiente = siguientePaso(historia.estado);
+  const semaforo = resumenSemaforo(historia.estado);
 
   return (
     <main>
       <section className="page-hero">
         <span className="pill pill-amber">Historia</span>
         <h1>Detalle de historia</h1>
-        <p>Revisa el estado, mira el recorrido del flujo y ejecuta la siguiente acción disponible.</p>
+        <p>Revisa el estado, mira el recorrido del flujo y ejecuta la siguiente accion disponible.</p>
       </section>
 
-      <div className="page-grid">
-        <div className="section-stack">
+      <div className="review-layout">
+        <div className="review-main">
           <Card className="card--accent">
             <div className="section-heading">
               <h2>Resumen operativo</h2>
-              <p>Vista compacta del estado actual y su posición en el flujo.</p>
+              <p>Vista compacta de la historia, su semaforo tecnico y la posicion real en el flujo.</p>
             </div>
-            <div className="metric-grid">
-              <div className="metric">
+
+            <div className="review-summary-grid">
+              <div className="review-metric">
                 <div className="metric-label">Estado</div>
                 <div className="metric-value">{historia.estado}</div>
               </div>
-              <div className="metric">
+              <div className="review-metric">
                 <div className="metric-label">Cliente</div>
                 <div className="metric-value">{historia.clienteId}</div>
               </div>
-              <div className="metric">
+              <div className="review-metric">
                 <div className="metric-label">ID</div>
-                <div className="metric-value" style={{ fontSize: "1rem" }}>
-                  {historia.id}
-                </div>
+                <div className="metric-value review-id">{historia.id}</div>
               </div>
             </div>
-            <div className="summary-list" style={{ marginTop: 16 }}>
+
+            <div className={`signal-banner signal-banner--${semaforo.tone}`}>
+              <div className="signal-dot" />
+              <div>
+                <strong>{semaforo.titulo}</strong>
+                <span>{semaforo.descripcion}</span>
+              </div>
+            </div>
+
+            <div className="summary-list summary-list--tight">
               <div className="summary-row">
                 <span>Sizing calculado</span>
                 <strong>{historia.sizingCalculado ?? "Pendiente"}</strong>
@@ -189,20 +256,29 @@ export default async function HistoriaDetallePage({
                 <span>Puntos</span>
                 <strong>{historia.puntosCalculados ?? "Pendiente"}</strong>
               </div>
+              <div className="summary-row">
+                <span>Revision tecnica</span>
+                <strong>{formatState(historia.estado)}</strong>
+              </div>
             </div>
           </Card>
 
           <Card>
             <div className="section-heading">
-              <h2>Progreso</h2>
-              <p>El portal está organizado por etapas. La fase activa aparece resaltada.</p>
+              <h2>Progreso por etapas</h2>
+              <p>La fase activa queda resaltada. Si el sizing aparece, ya se paso por la compuerta de calidad.</p>
             </div>
             <div className="status-flow">
               {FLOW_STAGES.map((stage, index) => {
                 const activo = index === pasoActual;
                 const completado = index < pasoActual;
                 return (
-                  <div key={stage.title} className="status-step" data-active={activo ? "true" : "false"} data-complete={completado ? "true" : "false"}>
+                  <div
+                    key={stage.title}
+                    className="status-step"
+                    data-active={activo ? "true" : "false"}
+                    data-complete={completado ? "true" : "false"}
+                  >
                     <div className="status-step-header">
                       <span className="status-step-index">{String(index + 1).padStart(2, "0")}</span>
                       <strong>{stage.title}</strong>
@@ -217,8 +293,8 @@ export default async function HistoriaDetallePage({
 
           <Card>
             <div className="section-heading">
-              <h2>Texto y trazabilidad</h2>
-              <p>El texto original siempre queda separado del OCR para auditar el flujo.</p>
+              <h2>Historia y evidencia</h2>
+              <p>El texto original y el OCR quedan separados para mantener la trazabilidad.</p>
             </div>
             <div className="detail-copy-grid">
               <div className="detail-copy">
@@ -235,23 +311,52 @@ export default async function HistoriaDetallePage({
           </Card>
         </div>
 
-        <div className="section-stack">
+        <aside className="review-side">
           <Card className="card--accent">
             <div className="section-heading">
-              <h2>Próximo paso</h2>
-              <p>Esto te indica qué acción tiene sentido hacer ahora mismo.</p>
+              <h2>Semaforo de calidad</h2>
+              <p>Este panel resume si la historia ya tiene forma suficiente para seguir el flujo.</p>
+            </div>
+            <div className="signal-grid signal-grid--compact">
+              <div className={`signal-card signal-card--${semaforo.tone}`}>
+                <span>Calidad</span>
+                <strong>{semaforo.titulo}</strong>
+                <p>{semaforo.descripcion}</p>
+              </div>
+              <div className="signal-card">
+                <span>OCR</span>
+                <strong>{historia.textoOcr ? "Disponible" : "Sin OCR"}</strong>
+                <p>{historia.contieneContenidoOcr ? "La historia fue marcada con contenido OCR." : "El OCR no se marco como presente."}</p>
+              </div>
+              <div className="signal-card">
+                <span>Sizing</span>
+                <strong>{historia.sizingCalculado ? `Listo: ${historia.sizingCalculado}` : "Bloqueado"}</strong>
+                <p>{historia.sizingCalculado ? "Ya existe una estimacion calculada." : "Solo se habilita cuando la historia esta completa."}</p>
+              </div>
+              <div className="signal-card">
+                <span>Flujo</span>
+                <strong>{FLOW_STAGES[pasoActual].title}</strong>
+                <p>{FLOW_STAGES[pasoActual].hint}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card className="card--accent">
+            <div className="section-heading">
+              <h2>Proximo paso</h2>
+              <p>Esto te indica que accion tiene sentido hacer ahora mismo.</p>
             </div>
             <div className="callout callout-info">
               <strong>{pasoSiguiente.title}</strong>
               <span>{pasoSiguiente.description}</span>
             </div>
-            <div className="summary-list">
+            <div className="summary-list summary-list--tight">
               <div className="summary-row">
-                <span>Acción sugerida</span>
+                <span>Accion sugerida</span>
                 <strong>{pasoSiguiente.cta}</strong>
               </div>
               <div className="summary-row">
-                <span>Acceso rápido</span>
+                <span>Acceso rapido</span>
                 <strong>
                   <a href="#acciones">Ir a acciones</a>
                 </strong>
@@ -264,8 +369,11 @@ export default async function HistoriaDetallePage({
           </Card>
 
           <Card>
-            <h2>Guía rápida</h2>
-            <div className="summary-list">
+            <div className="section-heading">
+              <h2>Guia rapida</h2>
+              <p>La vista sigue una secuencia simple: calidad, sizing, validacion y cierre.</p>
+            </div>
+            <div className="summary-list summary-list--tight">
               <div className="summary-row">
                 <span>Etapa activa</span>
                 <strong>{FLOW_STAGES[pasoActual].title}</strong>
@@ -276,7 +384,7 @@ export default async function HistoriaDetallePage({
               </div>
               <div className="summary-row">
                 <span>Validar</span>
-                <strong>Solo líder</strong>
+                <strong>Solo lider</strong>
               </div>
               <div className="summary-row">
                 <span>Aceptar</span>
@@ -284,7 +392,7 @@ export default async function HistoriaDetallePage({
               </div>
             </div>
           </Card>
-        </div>
+        </aside>
       </div>
     </main>
   );
