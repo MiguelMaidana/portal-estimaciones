@@ -25,6 +25,10 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - Auth real ya resuelve identidad con Supabase y consulta `usuario`; en desarrollo sigue activo el fallback demo por headers.
 - Las paginas SSR ya usan la sesion de Supabase para redireccion y contexto de cliente.
 - Se agrego middleware para refresco de sesion Supabase en el frontend.
+- La capa de datos de historias, consumo, auditoria, matriz y usuarios ya usa Supabase Admin cuando hay credenciales; si no, conserva fallback local para desarrollo.
+- El demo queda alineado a `DEMO_CLIENT_ID = 11111111-1111-1111-1111-111111111111` para no romper la FK de `cliente`.
+- La migracion `supabase/migrations/0001_estimaciones.sql` ya incluye schema, indices, RLS y seed minimo de `DEMO` + matriz inicial.
+- Typecheck de workspace ejecutado y aprobado despues del cambio de persistencia.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.
