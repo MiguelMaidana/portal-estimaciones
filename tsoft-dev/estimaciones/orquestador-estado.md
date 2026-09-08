@@ -1,5 +1,5 @@
 # Estado del flujo - estimaciones
-Ultima actualizacion: 2026-09-08 10:37
+Ultima actualizacion: 2026-09-08 12:29
 
 ## Resumen
 Feature: estimaciones
@@ -36,6 +36,8 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - Se simplifico la pantalla de nueva historia para esta version: un solo input principal, sin OCR ni adjuntos.
 - Se corrijio el CTA de nueva historia a un texto que refleja el envio a evaluacion y se elimino la tarjeta auxiliar que quedaba suelta.
 - Se rearmo el header global con estado activo por ruta y se ajustaron anchos y margenes para un shell mas limpio.
+- Se alinearon las pantallas de login y consumo al mismo layout de evaluacion con cards y semaforo.
+- Se revalido `pnpm typecheck` y `pnpm --filter @portal-estimaciones/web build` despues del ajuste de login y consumo.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.

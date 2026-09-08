@@ -24,6 +24,7 @@ export default async function ConsumoPage() {
   const lineaBase = consumo?.lineaBase ?? Number(process.env.DEMO_LINEA_BASE_PUNTOS ?? "100");
   const consumido = consumo?.consumido ?? 0;
   const disponible = lineaBase - consumido;
+  const uso = lineaBase > 0 ? Math.max(0, Math.min(100, Math.round((consumido / lineaBase) * 100))) : 0;
 
   return (
     <main>
@@ -32,27 +33,45 @@ export default async function ConsumoPage() {
         <h1>Linea base mensual</h1>
         <p>La visualizacion del consumo resume cuanto queda disponible para el cliente activo en el periodo seleccionado.</p>
       </section>
-      <div className="page-grid">
-        <Card>
-          <div className="metric-grid">
-            <div className="metric">
+
+      <div className="review-layout">
+        <Card className="card--accent">
+          <div className="section-heading">
+            <h2>Resumen de puntos</h2>
+            <p>Vista compacta del consumo actual para entender el margen disponible.</p>
+          </div>
+
+          <div className="review-summary-grid">
+            <div className="review-metric">
               <div className="metric-label">Linea base</div>
               <div className="metric-value">{lineaBase}</div>
             </div>
-            <div className="metric">
+            <div className="review-metric">
               <div className="metric-label">Consumido</div>
               <div className="metric-value">{consumido}</div>
             </div>
-            <div className="metric">
+            <div className="review-metric">
               <div className="metric-label">Disponible</div>
               <div className="metric-value">{disponible}</div>
             </div>
           </div>
+
+          <div className="signal-banner signal-banner--blue">
+            <div className="signal-dot" />
+            <div>
+              <strong>{uso}% de uso</strong>
+              <span>El consumo se descuenta solo cuando la historia se acepta.</span>
+            </div>
+          </div>
         </Card>
-        <div className="section-stack">
+
+        <div className="review-side">
           <Card>
-            <h2>Contexto</h2>
-            <div className="summary-list">
+            <div className="section-heading">
+              <h2>Contexto</h2>
+              <p>Estos valores definen el periodo y el cliente que se esta mirando ahora.</p>
+            </div>
+            <div className="summary-list summary-list--tight">
               <div className="summary-row">
                 <span>Cliente</span>
                 <strong>{clienteId}</strong>
@@ -63,9 +82,16 @@ export default async function ConsumoPage() {
               </div>
             </div>
           </Card>
-          <Card>
-            <div className="info-banner">
-              El descuento de linea base ocurre solo cuando una historia se acepta.
+
+          <Card className="card--accent">
+            <div className="section-heading">
+              <span className="pill pill-amber">Regla de negocio</span>
+              <h2>Cuando impacta</h2>
+              <p>El descuento de linea base ocurre solo cuando una historia se acepta.</p>
+            </div>
+            <div className="callout callout-warning">
+              <strong>Impacto directo</strong>
+              <span>Si la historia no fue aceptada, el consumo no cambia.</span>
             </div>
           </Card>
         </div>
