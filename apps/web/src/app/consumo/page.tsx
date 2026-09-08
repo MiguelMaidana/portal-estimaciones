@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { appContext } from "../../server/app-context";
 import { Card } from "../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../server/auth/resolve-identity";
+import { DEMO_CLIENT_ID } from "../../server/demo";
 
 function periodoActual() {
   return new Date().toISOString().slice(0, 7);
@@ -14,7 +15,7 @@ export default async function ConsumoPage() {
     redirect("/login");
   }
 
-  const clienteId = identity?.clienteId ?? "demo-cliente";
+  const clienteId = identity?.clienteId ?? DEMO_CLIENT_ID;
   const periodo = periodoActual();
   const consumo = await appContext.consumo.obtener(clienteId, periodo);
   const lineaBase = consumo?.lineaBase ?? Number(process.env.DEMO_LINEA_BASE_PUNTOS ?? "100");

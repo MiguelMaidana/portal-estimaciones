@@ -3,6 +3,7 @@
 import Link from "next/link";
 import type { FormEvent } from "react";
 import { useState } from "react";
+import { DEMO_CLIENT_ID } from "../../server/demo";
 
 interface NuevaHistoriaFormProps {
   demoMode: boolean;
@@ -46,7 +47,7 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
               "x-demo-mode": "1",
               "x-demo-user-id": "demo-user",
               "x-demo-role": "cliente",
-              "x-demo-cliente-id": clienteId
+              "x-demo-cliente-id": clienteId || DEMO_CLIENT_ID
             }
           : undefined
       });

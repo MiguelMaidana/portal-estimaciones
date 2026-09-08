@@ -3,6 +3,7 @@ import { createServerClient } from "@supabase/ssr";
 import type { SessionIdentity as ContractSessionIdentity } from "../use-cases/contracts";
 import { forbidden, unauthorized } from "../http/errors";
 import { createSupabaseServerClient } from "../../lib/supabase/server";
+import { DEMO_CLIENT_ID } from "../demo";
 
 export type SessionIdentity = ContractSessionIdentity;
 
@@ -16,7 +17,7 @@ type UsuarioRow = {
 const demoIdentity: SessionIdentity = {
   userId: "demo-user",
   rol: "cliente",
-  clienteId: "demo-cliente"
+  clienteId: DEMO_CLIENT_ID
 };
 
 function requireSupabaseConfig() {

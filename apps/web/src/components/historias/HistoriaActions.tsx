@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DEMO_CLIENT_ID } from "../../server/demo";
 
 type HistoriaEstado =
   | "BORRADOR"
@@ -59,7 +60,7 @@ export function HistoriaActions({ historiaId, estado, demoMode }: HistoriaAction
                 "x-demo-mode": "1",
                 "x-demo-user-id": demoMode ? `${rolDemo}-user` : "",
                 "x-demo-role": demoMode ? rolDemo : "",
-                "x-demo-cliente-id": "demo-cliente"
+                "x-demo-cliente-id": DEMO_CLIENT_ID
               }
             : {})
         },

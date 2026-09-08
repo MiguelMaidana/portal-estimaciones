@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { NuevaHistoriaForm } from "../../../components/historias/NuevaHistoriaForm";
 import { Card } from "../../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../../server/auth/resolve-identity";
+import { DEMO_CLIENT_ID } from "../../../server/demo";
 
 export default async function NuevaHistoriaPage({
   searchParams
@@ -21,7 +22,7 @@ export default async function NuevaHistoriaPage({
   }
 
   const demoMode = demoRequested || !identity;
-  const clienteId = identity?.clienteId ?? "demo-cliente";
+  const clienteId = identity?.clienteId ?? DEMO_CLIENT_ID;
 
   return (
     <main>

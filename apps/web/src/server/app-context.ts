@@ -9,6 +9,7 @@ import { HistoriaMemoryRepository } from "./data/historias";
 import { MatrizMemoryRepository } from "./data/matrices";
 import { UsuarioMemoryRepository } from "./data/usuarios";
 import { unauthorized } from "./http/errors";
+import { DEMO_CLIENT_ID } from "./demo";
 import type { CalidadPort, RepositorioAuditoria, SessionIdentity, SizingPort } from "./use-cases/contracts";
 
 class LocalQualityPort implements CalidadPort {
@@ -73,7 +74,7 @@ export const appContext: AppContext = {
   identity: {
     userId: "demo-user",
     rol: "cliente",
-    clienteId: "demo-cliente"
+    clienteId: DEMO_CLIENT_ID
   },
   historias,
   matrices,
@@ -100,6 +101,6 @@ export async function resolveAppIdentity(request: Request) {
 }
 
 export function seedDemoMatrix() {
-  void matrices.obtenerVigente("demo-cliente");
+  void matrices.obtenerVigente(DEMO_CLIENT_ID);
   void matrizSizingSchema.parse(DEMOMatrix);
 }
