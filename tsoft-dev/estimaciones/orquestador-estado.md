@@ -33,6 +33,7 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - Se valido el redisenio con `pnpm --filter @portal-estimaciones/web build`.
 - Se alineo el panel del lider al mismo lenguaje visual de evaluacion y semaforo.
 - Se revalido `pnpm typecheck` y `pnpm --filter @portal-estimaciones/web build` despues del ajuste del lider.
+- Se simplifico la pantalla de nueva historia para esta version: un solo input principal, sin OCR ni adjuntos.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.

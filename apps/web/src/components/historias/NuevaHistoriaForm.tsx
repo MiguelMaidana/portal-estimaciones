@@ -11,54 +11,50 @@ interface NuevaHistoriaFormProps {
   clienteId: string;
 }
 
-function contarCoincidencias(texto: string) {
-  const limpio = texto.toLowerCase();
-  return ["como", "quiero", "para"].filter((fragmento) => limpio.includes(fragmento)).length;
+function evaluarHistoria(texto: string) {
+  const limpio = texto.trim().toLowerCase();
+  const tieneFormatoBase = limpio.includes("como") && limpio.includes("quiero") && limpio.includes("para");
+  const tieneCuerpo = limpio.length >= 80;
+
+  if (!limpio) {
+    return {
+      tone: "rojo",
+      titulo: "Todavia esta vacia",
+      descripcion: "Escribe la historia antes de evaluar cualquier cosa."
+    };
+  }
+
+  if (tieneFormatoBase && tieneCuerpo) {
+    return {
+      tone: "verde",
+      titulo: "Lista para analisis",
+      descripcion: "Ya tiene forma de historia y puede pasar al flujo de calidad."
+    };
+  }
+
+  if (tieneFormatoBase || tieneCuerpo) {
+    return {
+      tone: "amber",
+      titulo: "Casi lista",
+      descripcion: "Se entiende la base, pero aun falta detalle para entrar limpia al analisis."
+    };
+  }
+
+  return {
+    tone: "rojo",
+    titulo: "Necesita reescritura",
+    descripcion: "No aparece una historia clara todavia."
+  };
 }
 
 export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProps) {
   const [textoOriginal, setTextoOriginal] = useState("");
-  const [textoOcr, setTextoOcr] = useState("");
-  const [contieneContenidoOcr, setContieneContenidoOcr] = useState(false);
-  const [imagenes, setImagenes] = useState<FileList | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [createdId, setCreatedId] = useState<string | null>(null);
 
-  const historiaLimpia = textoOriginal.trim();
-  const ocrLimpio = textoOcr.trim();
-  const estructuraBase = contarCoincidencias(historiaLimpia);
-  const calidadBase = [historiaLimpia.length >= 60, estructuraBase >= 2, historiaLimpia.length >= 140].filter(Boolean).length;
-  const tonoSemaforo = calidadBase >= 3 ? "verde" : calidadBase >= 2 ? "amber" : "rojo";
-  const semaforoTexto =
-    tonoSemaforo === "verde"
-      ? "Lista para pasar a evaluacion"
-      : tonoSemaforo === "amber"
-        ? "Aun necesita detalle"
-        : "Todavia esta en captura";
-  const detallesEvaluacion = [
-    {
-      label: "Historia de usuario",
-      value: historiaLimpia ? "Redactada" : "Pendiente",
-      note: historiaLimpia ? "Hay contenido para evaluar." : "Necesitamos el texto principal."
-    },
-    {
-      label: "Estructura",
-      value: estructuraBase >= 3 ? "Como / Quiero / Para" : estructuraBase === 2 ? "Parcial" : "Sin patron claro",
-      note: estructuraBase >= 2 ? "El formato base ya aparece." : "Todavia falta la forma de historia."
-    },
-    {
-      label: "OCR",
-      value: contieneContenidoOcr || ocrLimpio ? "Con apoyo OCR" : "No aplica",
-      note: ocrLimpio ? "Existe texto extraido para revisar manualmente." : "Si hay imagenes, el OCR se completa despues."
-    },
-    {
-      label: "Adjuntos",
-      value: imagenes?.length ? `${imagenes.length} imagen${imagenes.length === 1 ? "" : "es"}` : "Sin imagenes",
-      note: "El soporte visual suma trazabilidad, no reemplaza la historia."
-    }
-  ];
+  const analisis = evaluarHistoria(textoOriginal);
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -70,14 +66,8 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
       const formData = new FormData();
       formData.set("clienteId", clienteId);
       formData.set("textoOriginal", textoOriginal);
-      formData.set("textoOcr", textoOcr);
-      formData.set("contieneContenidoOcr", String(contieneContenidoOcr));
-
-      if (imagenes) {
-        Array.from(imagenes).forEach((file) => {
-          formData.append("imagenes", file);
-        });
-      }
+      formData.set("textoOcr", "");
+      formData.set("contieneContenidoOcr", "false");
 
       const response = await fetch("/api/historias", {
         method: "POST",
@@ -104,9 +94,6 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
       setMessage(`Historia creada (${payload?.id ?? "sin id"}) en estado ${payload?.estado ?? "desconocido"}.`);
       setCreatedId(payload?.id ?? null);
       setTextoOriginal("");
-      setTextoOcr("");
-      setContieneContenidoOcr(false);
-      setImagenes(null);
     } catch (err) {
       setError(err instanceof Error ? err.message : "No se pudo crear la historia.");
     } finally {
@@ -120,7 +107,7 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
         <div className="section-heading">
           <span className="pill pill-blue">Historia de usuario</span>
           <h2>Redaccion y carga</h2>
-          <p>Una sola historia a la vez. El evaluador tecnico de la derecha te dice si ya tiene forma suficiente para entrar al flujo.</p>
+          <p>Una sola historia a la vez. La evaluacion inicial se ve a la derecha y te marca si ya tiene forma suficiente.</p>
         </div>
 
         <form onSubmit={handleSubmit} className="story-form">
@@ -131,42 +118,10 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
             id="textoOriginal"
             value={textoOriginal}
             onChange={(event) => setTextoOriginal(event.target.value)}
-            className="story-textarea"
+            className="story-textarea story-textarea--large"
             placeholder="Como cliente quiero ... para ..."
-            rows={8}
+            rows={12}
             required
-          />
-
-          <label className="story-label" htmlFor="textoOcr">
-            Texto OCR
-          </label>
-          <textarea
-            id="textoOcr"
-            value={textoOcr}
-            onChange={(event) => setTextoOcr(event.target.value)}
-            className="story-textarea"
-            placeholder="Texto extraido de imagenes, si aplica"
-            rows={5}
-          />
-
-          <label className="story-check">
-            <input
-              type="checkbox"
-              checked={contieneContenidoOcr}
-              onChange={(event) => setContieneContenidoOcr(event.target.checked)}
-            />
-            La historia incluye OCR
-          </label>
-
-          <label className="story-label" htmlFor="imagenes">
-            Imagenes
-          </label>
-          <input
-            id="imagenes"
-            type="file"
-            accept="image/png,image/jpeg"
-            multiple
-            onChange={(event) => setImagenes(event.target.files)}
           />
 
           <button type="submit" className="story-button" disabled={isSubmitting}>
@@ -188,79 +143,62 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
         <Card className="card--accent">
           <div className="section-heading">
             <span className="pill pill-amber">Evaluador tecnico</span>
-            <h2>Semaforo de calidad</h2>
-            <p>Este panel no calcula el sizing final. Solo te dice si la historia ya esta lista para pasar a analisis.</p>
+            <h2>Primer analisis</h2>
+            <p>Este es el control rapido previo a calidad. No reemplaza el sizing, solo decide si la historia entra al flujo.</p>
           </div>
 
-          <div className={`signal-banner signal-banner--${tonoSemaforo}`}>
+          <div className={`signal-banner signal-banner--${analisis.tone}`}>
             <div className="signal-dot" />
             <div>
-              <strong>{semaforoTexto}</strong>
-              <span>El sizing queda bloqueado hasta que la historia este completa.</span>
+              <strong>{analisis.titulo}</strong>
+              <span>{analisis.descripcion}</span>
             </div>
           </div>
 
-          <div className="signal-grid">
-            {detallesEvaluacion.map((item) => (
-              <div key={item.label} className="signal-card">
-                <span>{item.label}</span>
-                <strong>{item.value}</strong>
-                <p>{item.note}</p>
-              </div>
-            ))}
-          </div>
-        </Card>
-
-        <Card>
-          <div className="section-heading">
-            <h2>Reglas de la carga</h2>
-            <p>La pantalla esta pensada como una compuerta antes del flujo principal.</p>
-          </div>
-          <div className="summary-list">
-            <div className="summary-row">
-              <span>Entrada</span>
-              <strong>Una historia por vez</strong>
+          <div className="signal-grid signal-grid--compact">
+            <div className="signal-card">
+              <span>Historia</span>
+              <strong>{textoOriginal.trim() ? "Cargada" : "Pendiente"}</strong>
+              <p>La historia es la unica entrada de esta version.</p>
             </div>
-            <div className="summary-row">
-              <span>OCR</span>
-              <strong>Best effort con revision manual</strong>
+            <div className="signal-card">
+              <span>Estructura</span>
+              <strong>{textoOriginal.toLowerCase().includes("como") && textoOriginal.toLowerCase().includes("quiero") && textoOriginal.toLowerCase().includes("para") ? "Base reconocible" : "Aun difusa"}</strong>
+              <p>Buscamos una narracion clara, no un checklist tecnico.</p>
             </div>
-            <div className="summary-row">
-              <span>Salida</span>
-              <strong>Estado inicial del analisis</strong>
-            </div>
-            <div className="summary-row">
-              <span>Sizing</span>
-              <strong>Solo cuando calidad da verde</strong>
+            <div className="signal-card">
+              <span>Salida esperada</span>
+              <strong>{analisis.tone === "verde" ? "Pasa a calidad" : "Pide ajuste"}</strong>
+              <p>Si entra, la siguiente pantalla toma el relevo con calidad y sizing.</p>
             </div>
           </div>
         </Card>
 
         <Card>
           <div className="section-heading">
-            <h2>Definicion de la salida</h2>
-            <p>Si la historia pasa, el flujo la toma para calidad, sizing y validacion.</p>
+            <h2>Como sigue</h2>
+            <p>En esta version el flujo es simple: escribir, evaluar y avanzar.</p>
           </div>
           <div className="flow-mini">
             <div className="flow-mini-step">
               <span>01</span>
               <div>
-                <strong>Captura</strong>
-                <p>Se guarda texto, OCR e imagenes si existen.</p>
+                <strong>Cargar historia</strong>
+                <p>Una sola historia por vez, sin OCR ni adjuntos en esta iteracion.</p>
               </div>
             </div>
             <div className="flow-mini-step">
               <span>02</span>
               <div>
-                <strong>Evaluacion</strong>
-                <p>Se decide si pasa a completa o si vuelve con observaciones.</p>
+                <strong>Primer analisis</strong>
+                <p>La derecha te muestra si ya entra al circuito de calidad.</p>
               </div>
             </div>
             <div className="flow-mini-step">
               <span>03</span>
               <div>
-                <strong>Sizing</strong>
-                <p>Solo arranca cuando la historia queda completa.</p>
+                <strong>Ir a detalle</strong>
+                <p>Cuando se crea, el registro te lleva a la pantalla con el flujo completo.</p>
               </div>
             </div>
           </div>
