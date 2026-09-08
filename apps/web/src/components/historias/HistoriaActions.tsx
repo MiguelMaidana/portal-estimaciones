@@ -56,6 +56,7 @@ export function HistoriaActions({ historiaId, estado, demoMode }: HistoriaAction
           ...(body ? { "Content-Type": "application/json" } : {}),
           ...(demoMode
             ? {
+                "x-demo-mode": "1",
                 "x-demo-user-id": demoMode ? `${rolDemo}-user` : "",
                 "x-demo-role": demoMode ? rolDemo : "",
                 "x-demo-cliente-id": "demo-cliente"

@@ -13,6 +13,12 @@ type UsuarioRow = {
   activo: boolean;
 };
 
+const demoIdentity: SessionIdentity = {
+  userId: "demo-user",
+  rol: "cliente",
+  clienteId: "demo-cliente"
+};
+
 function requireSupabaseConfig() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
@@ -46,6 +52,23 @@ function parseCookieHeader(cookieHeader: string | null) {
       };
     })
     .filter((item): item is { name: string; value: string } => item !== null);
+}
+
+function resolveDemoIdentity(request: Request): SessionIdentity | null {
+  if (request.headers.get("x-demo-mode") !== "1") {
+    return null;
+  }
+
+  const rol = request.headers.get("x-demo-role")?.trim();
+  if (rol !== "cliente" && rol !== "lider") {
+    throw unauthorized("Invalid demo role");
+  }
+
+  return {
+    userId: request.headers.get("x-demo-user-id")?.trim() || demoIdentity.userId,
+    rol,
+    clienteId: request.headers.get("x-demo-cliente-id")?.trim() || demoIdentity.clienteId
+  };
 }
 
 async function resolveIdentityByUserId(userId: string): Promise<SessionIdentity> {
@@ -84,6 +107,11 @@ async function resolveIdentityByUserId(userId: string): Promise<SessionIdentity>
 }
 
 export async function resolveIdentityFromRequest(request: Request): Promise<SessionIdentity> {
+  const demo = resolveDemoIdentity(request);
+  if (demo) {
+    return demo;
+  }
+
   const authorization = request.headers.get("authorization");
 
   if (authorization?.startsWith("Bearer ")) {

@@ -43,6 +43,7 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
         body: formData,
         headers: demoMode
           ? {
+              "x-demo-mode": "1",
               "x-demo-user-id": "demo-user",
               "x-demo-role": "cliente",
               "x-demo-cliente-id": clienteId
