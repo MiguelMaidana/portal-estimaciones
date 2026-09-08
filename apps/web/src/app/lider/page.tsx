@@ -176,15 +176,20 @@ export default async function LiderPage() {
             {listaOrdenada.length ? (
               <div className="history-list">
                 {listaOrdenada.map((historia) => (
-                  <div key={historia.id} className="history-item">
-                    <div>
-                      <strong>{historia.id}</strong>
-                      <p>{historia.clienteId}</p>
-                    </div>
-                    <span className={etiquetaEstado(historia.estado)}>{formatState(historia.estado)}</span>
+                <div key={historia.id} className="history-item">
+                  <div>
+                    <strong>{historia.id}</strong>
+                    <p>{historia.clienteId}</p>
                   </div>
-                ))}
-              </div>
+                  <div className="history-meta">
+                    <span className={etiquetaEstado(historia.estado)}>{formatState(historia.estado)}</span>
+                    <span className="pill pill-blue">
+                      {historia.sizingCalculado ? `Sizing ${historia.sizingCalculado}` : "Sin sizing"}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
             ) : (
               <div className="empty-state">
                 <strong>Aún no hay historias cargadas</strong>

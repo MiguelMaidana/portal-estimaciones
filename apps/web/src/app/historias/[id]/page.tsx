@@ -180,6 +180,16 @@ export default async function HistoriaDetallePage({
                 </div>
               </div>
             </div>
+            <div className="summary-list" style={{ marginTop: 16 }}>
+              <div className="summary-row">
+                <span>Sizing calculado</span>
+                <strong>{historia.sizingCalculado ?? "Pendiente"}</strong>
+              </div>
+              <div className="summary-row">
+                <span>Puntos</span>
+                <strong>{historia.puntosCalculados ?? "Pendiente"}</strong>
+              </div>
+            </div>
           </Card>
 
           <Card>
