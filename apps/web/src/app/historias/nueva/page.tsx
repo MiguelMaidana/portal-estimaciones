@@ -31,7 +31,7 @@ export default async function NuevaHistoriaPage({
       <section className="page-hero">
         <span className="pill pill-green">{demoMode ? "Demo" : "Sesion activa"}</span>
         <h1>Nueva historia</h1>
-        <p>Redacta una historia, adjunta imagenes si hace falta y deja que el flujo la lleve a calidad, sizing y validacion.</p>
+        <p>Redacta una historia y deja que el flujo la lleve a calidad, sizing y validacion.</p>
       </section>
       <NuevaHistoriaForm demoMode={demoMode} clienteId={clienteId} />
     </main>

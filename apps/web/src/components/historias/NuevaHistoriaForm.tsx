@@ -125,7 +125,7 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
           />
 
           <button type="submit" className="story-button" disabled={isSubmitting}>
-            {isSubmitting ? "Creando..." : "Crear historia"}
+            {isSubmitting ? "Enviando..." : "Enviar a evaluación"}
           </button>
 
           {demoMode ? <p className="story-note">Modo demo activo: la API usa headers de desarrollo.</p> : null}
@@ -172,35 +172,9 @@ export function NuevaHistoriaForm({ demoMode, clienteId }: NuevaHistoriaFormProp
               <p>Si entra, la siguiente pantalla toma el relevo con calidad y sizing.</p>
             </div>
           </div>
-        </Card>
-
-        <Card>
-          <div className="section-heading">
-            <h2>Como sigue</h2>
-            <p>En esta version el flujo es simple: escribir, evaluar y avanzar.</p>
-          </div>
-          <div className="flow-mini">
-            <div className="flow-mini-step">
-              <span>01</span>
-              <div>
-                <strong>Cargar historia</strong>
-                <p>Una sola historia por vez, sin OCR ni adjuntos en esta iteracion.</p>
-              </div>
-            </div>
-            <div className="flow-mini-step">
-              <span>02</span>
-              <div>
-                <strong>Primer analisis</strong>
-                <p>La derecha te muestra si ya entra al circuito de calidad.</p>
-              </div>
-            </div>
-            <div className="flow-mini-step">
-              <span>03</span>
-              <div>
-                <strong>Ir a detalle</strong>
-                <p>Cuando se crea, el registro te lleva a la pantalla con el flujo completo.</p>
-              </div>
-            </div>
+          <div className="callout callout-info" style={{ marginTop: 14 }}>
+            <strong>Siguiente paso</strong>
+            <span>{analisis.tone === "verde" ? "Pasar al detalle para calidad y sizing." : "Ajustar la historia antes de continuar."}</span>
           </div>
         </Card>
       </div>

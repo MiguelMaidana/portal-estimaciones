@@ -34,6 +34,7 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - Se alineo el panel del lider al mismo lenguaje visual de evaluacion y semaforo.
 - Se revalido `pnpm typecheck` y `pnpm --filter @portal-estimaciones/web build` despues del ajuste del lider.
 - Se simplifico la pantalla de nueva historia para esta version: un solo input principal, sin OCR ni adjuntos.
+- Se corrijio el CTA de nueva historia a un texto que refleja el envio a evaluacion y se elimino la tarjeta auxiliar que quedaba suelta.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.
