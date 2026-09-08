@@ -36,19 +36,35 @@ function ordenEstado(estado: HistoriaEstado) {
 }
 
 function formatState(estado: HistoriaEstado) {
-  if (estado === "PENDIENTE_VALIDACION_LIDER") {
-    return "Listo para revisar";
-  }
-
-  if (estado === "SIZING_VALIDADO") {
-    return "Validado";
-  }
-
-  if (estado === "COMPLETA") {
-    return "Listo para sizing";
-  }
-
+  if (estado === "PENDIENTE_VALIDACION_LIDER") return "Listo para revisar";
+  if (estado === "SIZING_VALIDADO") return "Validado";
+  if (estado === "COMPLETA") return "Listo para sizing";
+  if (estado === "EN_SIZING") return "Calculando sizing";
   return estado;
+}
+
+function semaforoLider(pendientes: number, completas: number, aceptadas: number) {
+  if (pendientes > 0) {
+    return {
+      tone: "amber",
+      titulo: "Hay historias listas para revisar",
+      descripcion: "La cola ya tiene items que pueden pasar por validacion humana."
+    };
+  }
+
+  if (completas > 0 || aceptadas > 0) {
+    return {
+      tone: "blue",
+      titulo: "Flujo activo sin cola urgente",
+      descripcion: "Todavia hay trabajo, pero no hay historias esperando revision inmediata."
+    };
+  }
+
+  return {
+    tone: "green",
+    titulo: "Panel limpio",
+    descripcion: "No hay pendientes y el flujo esta estable."
+  };
 }
 
 export default async function LiderPage() {
@@ -60,7 +76,7 @@ export default async function LiderPage() {
         <section className="page-hero">
           <span className="pill pill-blue">Acceso</span>
           <h1>Panel del lider</h1>
-          <p>Esta vista está reservada para líderes. Tu sesión corresponde a un cliente, por eso redirigimos el foco a la carga de historias.</p>
+          <p>Esta vista esta reservada para lideres. Tu sesion corresponde a un cliente, por eso redirigimos el foco a la carga de historias.</p>
         </section>
         <Card>
           <p>
@@ -85,35 +101,52 @@ export default async function LiderPage() {
     aceptadas: historias.filter((historia) => historia.estado === "ACEPTADA").length
   };
 
+  const semaforo = semaforoLider(listas.pendientes, listas.completas, listas.aceptadas);
+
   return (
     <main>
       <section className="page-hero">
-        <span className="pill pill-amber">{demoMode ? "Demo" : "Líder"}</span>
-        <h1>Panel del líder</h1>
+        <span className="pill pill-amber">{demoMode ? "Demo" : "Lider"}</span>
+        <h1>Panel del lider</h1>
         <p>Revisa sizing, aprueba o corrige y controla la cola antes de publicar al cliente.</p>
       </section>
 
-      <div className="leader-layout">
-        <div className="leader-main">
-          <div className="metric-grid" style={{ marginBottom: 20 }}>
-            <Card className="metric-card">
-              <div className="metric-label">Historias</div>
-              <div className="metric-value">{total}</div>
-            </Card>
-            <Card className="metric-card">
-              <div className="metric-label">Pendientes de validación</div>
-              <div className="metric-value">{listas.pendientes}</div>
-            </Card>
-            <Card className="metric-card">
-              <div className="metric-label">Aceptadas</div>
-              <div className="metric-value">{listas.aceptadas}</div>
-            </Card>
-          </div>
+      <div className="review-layout">
+        <div className="review-main">
+          <Card className="card--accent">
+            <div className="section-heading">
+              <h2>Resumen operativo</h2>
+              <p>Vista compacta del panel con los indicadores que importan para decidir el siguiente paso.</p>
+            </div>
+
+            <div className="review-summary-grid">
+              <div className="review-metric">
+                <div className="metric-label">Historias</div>
+                <div className="metric-value">{total}</div>
+              </div>
+              <div className="review-metric">
+                <div className="metric-label">Pendientes de validacion</div>
+                <div className="metric-value">{listas.pendientes}</div>
+              </div>
+              <div className="review-metric">
+                <div className="metric-label">Aceptadas</div>
+                <div className="metric-value">{listas.aceptadas}</div>
+              </div>
+            </div>
+
+            <div className={`signal-banner signal-banner--${semaforo.tone}`}>
+              <div className="signal-dot" />
+              <div>
+                <strong>{semaforo.titulo}</strong>
+                <span>{semaforo.descripcion}</span>
+              </div>
+            </div>
+          </Card>
 
           <Card className="card--accent">
             <div className="section-heading">
-              <h2>Cola de validación</h2>
-              <p>La cola funciona como checklist de revisión. Aquí deben aparecer solo historias listas para la decisión del líder.</p>
+              <h2>Cola de validacion</h2>
+              <p>Las historias que llegan aqui ya deberian tener calidad suficiente para que el lider solo decida.</p>
             </div>
             {pendientes.length ? (
               <div className="queue-list">
@@ -135,37 +168,10 @@ export default async function LiderPage() {
               </div>
             ) : (
               <div className="empty-state empty-state--focus">
-                <strong>No hay historias pendientes de validación</strong>
-                <span>Cuando una historia llegue a PENDIENTE_VALIDACION_LIDER aparecerá aquí para su revisión.</span>
+                <strong>No hay historias pendientes de validacion</strong>
+                <span>Cuando una historia llegue a PENDIENTE_VALIDACION_LIDER aparecera aqui para revision.</span>
               </div>
             )}
-          </Card>
-        </div>
-
-        <aside className="leader-side">
-          <Card className="card--accent">
-            <div className="section-heading">
-              <h2>Checklist y dictamen</h2>
-              <p>Resumen operativo del panel para decidir rápido si algo sigue o vuelve atrás.</p>
-            </div>
-            <div className="checklist">
-              <div className="check-item">
-                <span>Calidad</span>
-                <strong>{listas.completas > 0 ? "Hay historias listas" : "Sin historias listas"}</strong>
-              </div>
-              <div className="check-item">
-                <span>Estado activo</span>
-                <strong>{demoMode ? "Demo local" : identity?.userId ?? "Sin sesión"}</strong>
-              </div>
-              <div className="check-item">
-                <span>Cola</span>
-                <strong>{pendientes.length ? "Con trabajo pendiente" : "Sin pendientes"}</strong>
-              </div>
-            </div>
-            <div className="callout callout-warning">
-              <strong>Dictamen</strong>
-              <span>{pendientes.length ? "Hay revisión pendiente." : "No hay acciones urgentes."}</span>
-            </div>
           </Card>
 
           <Card>
@@ -176,26 +182,85 @@ export default async function LiderPage() {
             {listaOrdenada.length ? (
               <div className="history-list">
                 {listaOrdenada.map((historia) => (
-                <div key={historia.id} className="history-item">
-                  <div>
-                    <strong>{historia.id}</strong>
-                    <p>{historia.clienteId}</p>
+                  <div key={historia.id} className="history-item">
+                    <div>
+                      <strong>{historia.id}</strong>
+                      <p>{historia.clienteId}</p>
+                    </div>
+                    <div className="history-meta">
+                      <span className={etiquetaEstado(historia.estado)}>{formatState(historia.estado)}</span>
+                      <span className="pill pill-blue">{historia.sizingCalculado ? `Sizing ${historia.sizingCalculado}` : "Sin sizing"}</span>
+                    </div>
                   </div>
-                  <div className="history-meta">
-                    <span className={etiquetaEstado(historia.estado)}>{formatState(historia.estado)}</span>
-                    <span className="pill pill-blue">
-                      {historia.sizingCalculado ? `Sizing ${historia.sizingCalculado}` : "Sin sizing"}
-                    </span>
-                  </div>
-                </div>
-              ))}
-            </div>
+                ))}
+              </div>
             ) : (
               <div className="empty-state">
-                <strong>Aún no hay historias cargadas</strong>
-                <span>Cuando uses el formulario de nueva historia, esta lista comenzará a llenarse.</span>
+                <strong>Aun no hay historias cargadas</strong>
+                <span>Cuando uses el formulario de nueva historia, esta lista comenzara a llenarse.</span>
               </div>
             )}
+          </Card>
+        </div>
+
+        <aside className="review-side">
+          <Card className="card--accent">
+            <div className="section-heading">
+              <h2>Checklist y dictamen</h2>
+              <p>Resumen operativo del panel para decidir rapido si algo sigue o vuelve atras.</p>
+            </div>
+            <div className="signal-grid signal-grid--compact">
+              <div className="signal-card">
+                <span>Calidad</span>
+                <strong>{listas.completas > 0 ? "Hay historias listas" : "Sin historias listas"}</strong>
+                <p>La cola solo deberia recibir historias que ya pasaron calidad.</p>
+              </div>
+              <div className="signal-card">
+                <span>Estado activo</span>
+                <strong>{demoMode ? "Demo local" : identity?.userId ?? "Sin sesion"}</strong>
+                <p>El contexto actual define quien puede aprobar y validar.</p>
+              </div>
+              <div className="signal-card">
+                <span>Cola</span>
+                <strong>{pendientes.length ? "Con trabajo pendiente" : "Sin pendientes"}</strong>
+                <p>Si aparece trabajo, entra por esta cola antes de publicar al cliente.</p>
+              </div>
+              <div className="signal-card signal-card--amber">
+                <span>Dictamen</span>
+                <strong>{pendientes.length ? "Hay revision pendiente" : "No hay acciones urgentes"}</strong>
+                <p>{pendientes.length ? "Conviene revisar la cola antes de mover historias hacia el cliente." : "El panel esta estable y sin bloqueos."}</p>
+              </div>
+            </div>
+          </Card>
+
+          <Card>
+            <div className="section-heading">
+              <h2>Guia rapida</h2>
+              <p>El lider solo entra cuando la historia ya tiene forma tecnica suficiente.</p>
+            </div>
+            <div className="flow-mini">
+              <div className="flow-mini-step">
+                <span>01</span>
+                <div>
+                  <strong>Revisar cola</strong>
+                  <p>Prioriza lo que esta en PENDIENTE_VALIDACION_LIDER.</p>
+                </div>
+              </div>
+              <div className="flow-mini-step">
+                <span>02</span>
+                <div>
+                  <strong>Validar sizing</strong>
+                  <p>Si hace falta, corrige antes de publicar al cliente.</p>
+                </div>
+              </div>
+              <div className="flow-mini-step">
+                <span>03</span>
+                <div>
+                  <strong>Seguir el flujo</strong>
+                  <p>La historia avanza hacia aceptacion, ejecucion y entrega.</p>
+                </div>
+              </div>
+            </div>
           </Card>
         </aside>
       </div>

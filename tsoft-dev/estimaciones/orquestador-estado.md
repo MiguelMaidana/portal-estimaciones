@@ -31,6 +31,8 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - Typecheck de workspace ejecutado y aprobado despues del cambio de persistencia.
 - Se re-tradujeron las pantallas de nueva historia y detalle hacia un layout de evaluacion con semaforo tecnico, sizing visible y panel lateral de acciones.
 - Se valido el redisenio con `pnpm --filter @portal-estimaciones/web build`.
+- Se alineo el panel del lider al mismo lenguaje visual de evaluacion y semaforo.
+- Se revalido `pnpm typecheck` y `pnpm --filter @portal-estimaciones/web build` despues del ajuste del lider.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.
