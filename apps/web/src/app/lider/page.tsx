@@ -3,6 +3,9 @@ import { Card } from "../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../server/auth/resolve-identity";
 import { appContext } from "../../server/app-context";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 type HistoriaEstado = Awaited<ReturnType<typeof appContext.historias.listar>>[number]["estado"];
 
 function etiquetaEstado(estado: HistoriaEstado) {

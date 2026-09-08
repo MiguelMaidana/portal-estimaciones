@@ -4,6 +4,9 @@ import { LoginForm } from "../../components/auth/LoginForm";
 import { Card } from "../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../server/auth/resolve-identity";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function LoginPage() {
   const identity = await resolveIdentityFromCurrentSession().catch(() => null);
 

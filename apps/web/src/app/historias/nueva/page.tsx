@@ -4,6 +4,9 @@ import { Card } from "../../../components/ui/Card";
 import { resolveIdentityFromCurrentSession } from "../../../server/auth/resolve-identity";
 import { DEMO_CLIENT_ID } from "../../../server/demo";
 
+export const dynamic = "force-dynamic";
+export const revalidate = 0;
+
 export default async function NuevaHistoriaPage({
   searchParams
 }: {
