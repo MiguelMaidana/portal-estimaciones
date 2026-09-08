@@ -35,14 +35,21 @@ a:hover {
   position: sticky;
   top: 0;
   z-index: 10;
+  backdrop-filter: blur(14px);
+  background: rgba(248, 250, 252, 0.84);
+  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.04);
+}
+
+.app-topbar-inner {
+  width: min(1240px, calc(100% - 32px));
+  margin: 0 auto;
+  min-height: 76px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 16px;
-  padding: 16px 24px;
-  backdrop-filter: blur(14px);
-  background: rgba(248, 250, 252, 0.8);
-  border-bottom: 1px solid rgba(15, 23, 42, 0.08);
+  gap: 18px;
+  padding: 10px 0;
 }
 
 .app-brand {
@@ -53,18 +60,27 @@ a:hover {
   letter-spacing: 0.02em;
 }
 
+.app-brand-copy {
+  display: grid;
+  gap: 2px;
+}
+
+.app-brand-title {
+  font-size: 0.98rem;
+  font-weight: 800;
+  line-height: 1.1;
+}
+
 .app-brand small {
-  display: block;
-  margin-top: 2px;
   font-size: 0.82rem;
   font-weight: 600;
   color: rgba(15, 23, 42, 0.6);
 }
 
 .app-brand-mark {
-  width: 36px;
-  height: 36px;
-  border-radius: 12px;
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
   display: grid;
   place-items: center;
   background: linear-gradient(135deg, var(--color-azul), #18304d);
@@ -76,14 +92,19 @@ a:hover {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
+  justify-content: flex-end;
 }
 
 .app-nav a {
-  padding: 10px 14px;
+  min-height: 40px;
+  display: inline-flex;
+  align-items: center;
+  padding: 0 14px;
   border-radius: 999px;
   color: #0f172a;
   background: rgba(255, 255, 255, 0.75);
   border: 1px solid rgba(15, 23, 42, 0.08);
+  font-weight: 700;
 }
 
 .app-nav a:hover {
@@ -97,9 +118,9 @@ a:hover {
 }
 
 main {
-  width: min(1180px, calc(100% - 32px));
+  width: min(1240px, calc(100% - 32px));
   margin: 0 auto;
-  padding: 28px 0 48px;
+  padding: 34px 0 56px;
 }
 
 .page-hero {
@@ -135,8 +156,35 @@ main {
   }
 
   .app-topbar {
-    align-items: flex-start;
+    position: static;
+  }
+
+  .app-topbar-inner {
+    width: min(1240px, calc(100% - 24px));
     flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px 0;
+  }
+}
+
+@media (max-width: 640px) {
+  main {
+    width: calc(100% - 24px);
+    padding: 24px 0 40px;
+  }
+
+  .app-topbar-inner {
+    width: calc(100% - 24px);
+  }
+
+  .app-nav {
+    width: 100%;
+  }
+
+  .app-nav a {
+    flex: 1 1 auto;
+    justify-content: center;
   }
 }
 
