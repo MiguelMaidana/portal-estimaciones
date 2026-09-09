@@ -1,5 +1,5 @@
 # Estado del flujo - estimaciones
-Ultima actualizacion: 2026-09-08 12:29
+Ultima actualizacion: 2026-09-09 07:57
 
 ## Resumen
 Feature: estimaciones
@@ -38,6 +38,9 @@ Documentador - requiere consolidar la documentacion del tramo implementado.
 - Se rearmo el header global con estado activo por ruta y se ajustaron anchos y margenes para un shell mas limpio.
 - Se alinearon las pantallas de login y consumo al mismo layout de evaluacion con cards y semaforo.
 - Se revalido `pnpm typecheck` y `pnpm --filter @portal-estimaciones/web build` despues del ajuste de login y consumo.
+- Se simplifico el detalle de historia: resultado, calidad y sizing arriba; contenido y criterios al centro; una sola accion contextual a la derecha.
+- El subagente desarrollador no pudo iniciar porque su modelo configurado no esta disponible con la cuenta actual; el IA Maker autorizo continuar directamente.
+- Se revalido `pnpm typecheck`, `pnpm --filter @portal-estimaciones/web build` y `git diff --check` despues de la pasada final del detalle.
 
 ## Notas del IA Maker
 El plan fue aprobado para avanzar con la implementacion base.

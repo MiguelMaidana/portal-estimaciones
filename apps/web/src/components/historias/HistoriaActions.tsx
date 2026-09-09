@@ -25,33 +25,9 @@ interface HistoriaActionsProps {
   demoMode: boolean;
 }
 
-function actionHint(estado: HistoriaEstado) {
-  if (estado === "COMPLETA") {
-    return "La historia ya puede pasar a sizing.";
-  }
-
-  if (estado === "PENDIENTE_VALIDACION_LIDER") {
-    return "La historia espera revisión del líder.";
-  }
-
-  if (estado === "PENDIENTE_ACEPTACION_CLIENTE") {
-    return "El siguiente paso es la decisión del cliente.";
-  }
-
-  if (estado === "ACEPTADA" || estado === "EN_EJECUCION") {
-    return "La historia quedó lista para cierre operativo.";
-  }
-
-  if (estado === "INCOMPLETA") {
-    return "Hace falta reenviar la historia corregida.";
-  }
-
-  return "No hay una acción directa disponible para este estado.";
-}
-
 async function parseResponse(response: Response) {
   const payload = (await response.json().catch(() => null)) as
-    | { error?: { message?: string }; estado?: string; puntosCalculados?: number; sizingCalculado?: string }
+    | { error?: { message?: string }; estado?: string }
     | null;
 
   if (!response.ok) {
@@ -67,7 +43,7 @@ export function HistoriaActions({ historiaId, estado, demoMode }: HistoriaAction
   const [isRunning, setIsRunning] = useState(false);
   const [liderAprueba, setLiderAprueba] = useState(true);
   const [clienteAcepta, setClienteAcepta] = useState(true);
-  const [rolDemo, setRolDemo] = useState<"cliente" | "lider">("lider");
+  const rolRequerido = estado === "PENDIENTE_ACEPTACION_CLIENTE" ? "cliente" : "lider";
 
   async function runAction(url: string, body?: unknown) {
     setIsRunning(true);
@@ -82,8 +58,8 @@ export function HistoriaActions({ historiaId, estado, demoMode }: HistoriaAction
           ...(demoMode
             ? {
                 "x-demo-mode": "1",
-                "x-demo-user-id": `${rolDemo}-user`,
-                "x-demo-role": rolDemo,
+                "x-demo-user-id": `${rolRequerido}-user`,
+                "x-demo-role": rolRequerido,
                 "x-demo-cliente-id": DEMO_CLIENT_ID
               }
             : {})
@@ -101,97 +77,77 @@ export function HistoriaActions({ historiaId, estado, demoMode }: HistoriaAction
     }
   }
 
-  const puedeCalcular = estado === "COMPLETA";
-  const puedeValidar = estado === "PENDIENTE_VALIDACION_LIDER" && (!demoMode || rolDemo === "lider");
-  const puedeAceptar = estado === "PENDIENTE_ACEPTACION_CLIENTE" && (!demoMode || rolDemo === "cliente");
-  const puedeEntregar = (estado === "ACEPTADA" || estado === "EN_EJECUCION") && (!demoMode || rolDemo === "lider");
+  const sinAccion = ![
+    "COMPLETA",
+    "PENDIENTE_VALIDACION_LIDER",
+    "PENDIENTE_ACEPTACION_CLIENTE",
+    "ACEPTADA",
+    "EN_EJECUCION"
+  ].includes(estado);
 
   return (
     <section className="story-actions" id="acciones">
       <div className="section-heading">
-        <h2>Acciones</h2>
-        <p>{actionHint(estado)}</p>
+        <span className="pill pill-blue">Accion disponible</span>
+        <h2>Siguiente decision</h2>
       </div>
 
-      {demoMode ? (
-        <label className="story-label" htmlFor="rolDemo">
-          Rol demo
-          <select
-            id="rolDemo"
-            value={rolDemo}
-            onChange={(event) => setRolDemo(event.target.value as "cliente" | "lider")}
-            className="story-input"
-          >
-            <option value="lider">Lider</option>
-            <option value="cliente">Cliente</option>
-          </select>
-        </label>
+      {estado === "COMPLETA" ? (
+        <div className="action-primary">
+          <strong>La calidad esta aprobada</strong>
+          <p>Ejecuta el motor deterministico para obtener tamano y puntos.</p>
+          <button type="button" className="story-button" onClick={() => void runAction(`/api/historias/${historiaId}/calcular-sizing`)} disabled={isRunning}>
+            {isRunning ? "Calculando..." : "Calcular sizing"}
+          </button>
+        </div>
       ) : null}
 
-      <div className="story-action-grid">
-        <div className="action-card">
-          <button
-            type="button"
-            className="story-button"
-            onClick={() => void runAction(`/api/historias/${historiaId}/calcular-sizing`)}
-            disabled={isRunning || !puedeCalcular}
-          >
-            Calcular sizing
-          </button>
-          <p>Disponible cuando la historia está completa.</p>
-        </div>
-
-        <div className="action-card">
-          <button
-            type="button"
-            className="story-button"
-            onClick={() => void runAction(`/api/historias/${historiaId}/validar`, { aprobado: liderAprueba })}
-            disabled={isRunning || !puedeValidar}
-          >
-            {liderAprueba ? "Aprobar sizing" : "Corregir sizing"}
-          </button>
-          <label className="story-check">
-            <input
-              type="checkbox"
-              checked={liderAprueba}
-              onChange={(event) => setLiderAprueba(event.target.checked)}
-            />
-            Lider aprueba
+      {estado === "PENDIENTE_VALIDACION_LIDER" ? (
+        <div className="action-primary">
+          <strong>Revision del lider</strong>
+          <p>Confirma el resultado calculado o devuelvelo para correccion.</p>
+          <label className="decision-toggle">
+            <input type="checkbox" checked={liderAprueba} onChange={(event) => setLiderAprueba(event.target.checked)} />
+            {liderAprueba ? "Aprobar resultado" : "Solicitar correccion"}
           </label>
-        </div>
-
-        <div className="action-card">
-          <button
-            type="button"
-            className="story-button"
-            onClick={() => void runAction(`/api/historias/${historiaId}/aceptar`, { aceptado: clienteAcepta })}
-            disabled={isRunning || !puedeAceptar}
-          >
-            {clienteAcepta ? "Aceptar" : "Rechazar"}
+          <button type="button" className="story-button" onClick={() => void runAction(`/api/historias/${historiaId}/validar`, { aprobado: liderAprueba })} disabled={isRunning}>
+            {isRunning ? "Guardando..." : liderAprueba ? "Aprobar sizing" : "Enviar a correccion"}
           </button>
-          <label className="story-check">
-            <input
-              type="checkbox"
-              checked={clienteAcepta}
-              onChange={(event) => setClienteAcepta(event.target.checked)}
-            />
-            Cliente acepta
+        </div>
+      ) : null}
+
+      {estado === "PENDIENTE_ACEPTACION_CLIENTE" ? (
+        <div className="action-primary">
+          <strong>Decision del cliente</strong>
+          <p>Al aceptar, los puntos se descuentan de la linea base mensual.</p>
+          <label className="decision-toggle">
+            <input type="checkbox" checked={clienteAcepta} onChange={(event) => setClienteAcepta(event.target.checked)} />
+            {clienteAcepta ? "Aceptar estimacion" : "Rechazar estimacion"}
           </label>
-        </div>
-
-        <div className="action-card">
-          <button
-            type="button"
-            className="story-button"
-            onClick={() => void runAction(`/api/historias/${historiaId}/entregar`)}
-            disabled={isRunning || !puedeEntregar}
-          >
-            Entregar
+          <button type="button" className="story-button" onClick={() => void runAction(`/api/historias/${historiaId}/aceptar`, { aceptado: clienteAcepta })} disabled={isRunning}>
+            {isRunning ? "Guardando..." : clienteAcepta ? "Aceptar estimacion" : "Rechazar estimacion"}
           </button>
-          <p>Marca el cierre operativo cuando la historia ya fue aceptada o está en ejecución.</p>
         </div>
-      </div>
+      ) : null}
 
+      {estado === "ACEPTADA" || estado === "EN_EJECUCION" ? (
+        <div className="action-primary">
+          <strong>Cierre operativo</strong>
+          <p>La estimacion ya fue aceptada. Marca la entrega cuando el trabajo este finalizado.</p>
+          <button type="button" className="story-button" onClick={() => void runAction(`/api/historias/${historiaId}/entregar`)} disabled={isRunning}>
+            {isRunning ? "Guardando..." : "Marcar como entregada"}
+          </button>
+        </div>
+      ) : null}
+
+      {sinAccion ? (
+        <div className="empty-state">
+          <strong>Sin acciones manuales ahora</strong>
+          <span>La historia esta esperando otra etapa del flujo.</span>
+        </div>
+      ) : null}
+
+      {demoMode ? <p className="story-note">Modo demo: la accion usa automaticamente el rol requerido.</p> : null}
       {message ? <p className="story-message">{message}</p> : null}
       {error ? <p className="story-error">{error}</p> : null}
     </section>

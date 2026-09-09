@@ -12,168 +12,74 @@ type HistoriaEstado = Awaited<ReturnType<typeof appContext.historias.listar>>[nu
 type FlowStage = {
   title: string;
   states: HistoriaEstado[];
-  hint: string;
-  action: string;
 };
 
 const FLOW_STAGES: FlowStage[] = [
-  {
-    title: "Carga",
-    states: ["BORRADOR", "EN_ANALISIS_COMPLETITUD", "INCOMPLETA"],
-    hint: "Captura de texto y revision de calidad.",
-    action: "Completar o reenviar la historia."
-  },
-  {
-    title: "Calidad",
-    states: ["COMPLETA"],
-    hint: "La historia ya cumple el umbral minimo.",
-    action: "Ir a calcular sizing."
-  },
-  {
-    title: "Sizing",
-    states: ["EN_SIZING", "SIZING_CALCULADO"],
-    hint: "Extraccion de criterios y calculo deterministico.",
-    action: "Validacion del lider."
-  },
-  {
-    title: "Lider",
-    states: ["PENDIENTE_VALIDACION_LIDER", "SIZING_VALIDADO"],
-    hint: "Aprobacion o correccion del sizing.",
-    action: "Publicar al cliente."
-  },
+  { title: "Carga", states: ["BORRADOR", "EN_ANALISIS_COMPLETITUD", "INCOMPLETA"] },
+  { title: "Calidad", states: ["COMPLETA"] },
+  { title: "Sizing", states: ["EN_SIZING", "SIZING_CALCULADO"] },
+  { title: "Lider", states: ["PENDIENTE_VALIDACION_LIDER", "SIZING_VALIDADO"] },
   {
     title: "Cliente",
-    states: ["PENDIENTE_ACEPTACION_CLIENTE", "RECHAZADA_POR_CLIENTE", "ACEPTADA", "EN_EJECUCION", "ENTREGADA"],
-    hint: "Aceptacion final, ejecucion y entrega.",
-    action: "Aceptar y descontar consumo."
+    states: ["PENDIENTE_ACEPTACION_CLIENTE", "RECHAZADA_POR_CLIENTE", "ACEPTADA", "EN_EJECUCION", "ENTREGADA"]
   }
 ];
 
-function estadoActual(indicado: HistoriaEstado) {
-  const index = FLOW_STAGES.findIndex((stage) => stage.states.includes(indicado));
-  return index === -1 ? 0 : index;
+function stageIndex(estado: HistoriaEstado) {
+  const index = FLOW_STAGES.findIndex((stage) => stage.states.includes(estado));
+  return index < 0 ? 0 : index;
 }
 
-function siguientePaso(estado: HistoriaEstado) {
-  if (estado === "BORRADOR" || estado === "EN_ANALISIS_COMPLETITUD") {
-    return {
-      title: "Esperando evaluacion de calidad",
-      description: "La historia todavia no quedo lista para sizing.",
-      cta: "Volver a la carga"
-    };
-  }
-
-  if (estado === "INCOMPLETA") {
-    return {
-      title: "Reenviar historia",
-      description: "La calidad no paso el umbral minimo. Corrige el texto y vuelve a enviar.",
-      cta: "Reenviar historia"
-    };
-  }
-
-  if (estado === "COMPLETA") {
-    return {
-      title: "Calcular sizing",
-      description: "La historia esta lista para extraer criterios y calcular tamano.",
-      cta: "Ir a acciones"
-    };
-  }
-
-  if (estado === "EN_SIZING" || estado === "SIZING_CALCULADO") {
-    return {
-      title: "Validacion del lider",
-      description: "El sizing ya fue calculado. Falta la revision humana obligatoria.",
-      cta: "Abrir acciones"
-    };
-  }
-
-  if (estado === "PENDIENTE_VALIDACION_LIDER") {
-    return {
-      title: "Revision del lider",
-      description: "La historia espera aprobacion o correccion antes de mostrarse al cliente.",
-      cta: "Validar sizing"
-    };
-  }
-
-  if (estado === "SIZING_VALIDADO" || estado === "PENDIENTE_ACEPTACION_CLIENTE") {
-    return {
-      title: "Aceptar por cliente",
-      description: "El resultado ya puede ser publicado para aceptacion final.",
-      cta: "Aceptar o rechazar"
-    };
-  }
-
-  if (estado === "ACEPTADA" || estado === "EN_EJECUCION") {
-    return {
-      title: "Cerrar entrega",
-      description: "La historia ya fue aceptada y solo resta la entrega operativa.",
-      cta: "Entregar"
-    };
-  }
-
-  return {
-    title: "Estado final",
-    description: "No hay una accion inmediata pendiente para este registro.",
-    cta: "Volver al inicio"
+function estadoLegible(estado: HistoriaEstado) {
+  const labels: Partial<Record<HistoriaEstado, string>> = {
+    BORRADOR: "Borrador",
+    EN_ANALISIS_COMPLETITUD: "Analizando calidad",
+    INCOMPLETA: "Requiere ajustes",
+    COMPLETA: "Calidad aprobada",
+    EN_SIZING: "Calculando sizing",
+    SIZING_CALCULADO: "Sizing calculado",
+    PENDIENTE_VALIDACION_LIDER: "Revision del lider",
+    SIZING_VALIDADO: "Sizing validado",
+    PENDIENTE_ACEPTACION_CLIENTE: "Esperando al cliente",
+    RECHAZADA_POR_CLIENTE: "Rechazada por cliente",
+    ACEPTADA: "Aceptada",
+    EN_EJECUCION: "En ejecucion",
+    ENTREGADA: "Entregada"
   };
+
+  return labels[estado] ?? estado;
 }
 
-function resumenSemaforo(estado: HistoriaEstado) {
-  if (estado === "INCOMPLETA" || estado === "BORRADOR" || estado === "EN_ANALISIS_COMPLETITUD") {
+function estadoVisual(estado: HistoriaEstado) {
+  if (["BORRADOR", "EN_ANALISIS_COMPLETITUD", "INCOMPLETA"].includes(estado)) {
     return {
       tone: "rojo",
-      titulo: "Aun no pasa el filtro de calidad",
-      descripcion: "Primero hay que completar la historia y resolver observaciones."
+      title: "La historia necesita trabajo",
+      description: "Todavia no supero el control de calidad y el sizing sigue bloqueado."
     };
   }
 
   if (estado === "COMPLETA" || estado === "EN_SIZING") {
     return {
       tone: "amber",
-      titulo: "Lista para sizing",
-      descripcion: "La compuerta de calidad ya quedo abierta y ahora entra el calculo deterministico."
+      title: "Calidad aprobada",
+      description: "La historia ya puede pasar al calculo deterministico de sizing."
     };
   }
 
-  if (estado === "SIZING_CALCULADO" || estado === "PENDIENTE_VALIDACION_LIDER" || estado === "SIZING_VALIDADO") {
+  if (["SIZING_CALCULADO", "PENDIENTE_VALIDACION_LIDER", "SIZING_VALIDADO"].includes(estado)) {
     return {
       tone: "blue",
-      titulo: "Sizing calculado y en revision",
-      descripcion: "Ya existe una estimacion, pero aun falta aprobacion o ajuste del lider."
+      title: "Estimacion calculada",
+      description: "El resultado existe y esta en la instancia de revision humana."
     };
   }
 
   return {
     tone: "green",
-    titulo: "Flujo encaminado",
-    descripcion: "La historia ya paso la etapa tecnica y avanza a aceptacion o cierre."
+    title: "Estimacion encaminada",
+    description: "La etapa tecnica termino y la historia avanza hacia aceptacion o entrega."
   };
-}
-
-function etiquetaEstado(estado: HistoriaEstado) {
-  if (estado === "PENDIENTE_VALIDACION_LIDER") return "pill pill-amber";
-  if (estado === "ACEPTADA" || estado === "ENTREGADA" || estado === "SIZING_VALIDADO") return "pill pill-green";
-  return "pill pill-blue";
-}
-
-function formatState(estado: HistoriaEstado) {
-  if (estado === "PENDIENTE_VALIDACION_LIDER") {
-    return "Listo para revisar";
-  }
-
-  if (estado === "SIZING_VALIDADO") {
-    return "Validado";
-  }
-
-  if (estado === "COMPLETA") {
-    return "Listo para sizing";
-  }
-
-  if (estado === "EN_SIZING") {
-    return "Calculando sizing";
-  }
-
-  return estado;
 }
 
 export default async function HistoriaDetallePage({
@@ -189,208 +95,144 @@ export default async function HistoriaDetallePage({
   const historia = await appContext.historias.obtenerPorId(id);
   const demoRequested = demo === "1";
 
-  if (!historia) {
-    notFound();
-  }
+  if (!historia) notFound();
+  if (!identity && process.env.NODE_ENV === "production" && !demoRequested) notFound();
 
-  if (!identity && process.env.NODE_ENV === "production" && !demoRequested) {
-    notFound();
-  }
+  const puedeVer = demoRequested || !identity || identity.rol === "lider" || identity.clienteId === historia.clienteId;
+  if (!puedeVer) notFound();
 
-  const puedeVer =
-    demoRequested || !identity || identity.rol === "lider" || identity.clienteId === historia.clienteId;
-
-  if (!puedeVer) {
-    notFound();
-  }
-
-  const pasoActual = estadoActual(historia.estado);
-  const pasoSiguiente = siguientePaso(historia.estado);
-  const semaforo = resumenSemaforo(historia.estado);
+  const currentStage = stageIndex(historia.estado);
+  const visual = estadoVisual(historia.estado);
+  const calidad =
+    historia.resultadoCompletitud === "completa"
+      ? "Apta"
+      : historia.resultadoCompletitud === "incompleta"
+        ? "Con observaciones"
+        : "En analisis";
 
   return (
     <main>
-      <section className="page-hero">
-        <span className="pill pill-amber">Historia</span>
-        <h1>Detalle de historia</h1>
-        <p>Revisa el estado, mira el recorrido del flujo y ejecuta la siguiente accion disponible.</p>
+      <section className="page-hero detail-hero">
+        <div>
+          <span className="pill pill-amber">Evaluacion</span>
+          <h1>Resultado de la historia</h1>
+          <p>Calidad, sizing y proxima decision en una sola vista.</p>
+        </div>
+        <span className={`pill ${visual.tone === "green" ? "pill-green" : visual.tone === "amber" ? "pill-amber" : "pill-blue"}`}>
+          {estadoLegible(historia.estado)}
+        </span>
       </section>
 
-      <div className="review-layout">
-        <div className="review-main">
-          <Card className="card--accent">
-            <div className="section-heading">
-              <h2>Resumen operativo</h2>
-              <p>Vista compacta de la historia, su semaforo tecnico y la posicion real en el flujo.</p>
-            </div>
+      <Card className="card--accent result-overview">
+        <div className={`result-verdict result-verdict--${visual.tone}`}>
+          <span className="result-kicker">Evaluador de calidad</span>
+          <h2>{visual.title}</h2>
+          <p>{historia.feedbackCompletitud || visual.description}</p>
+        </div>
+        <div className="result-stat">
+          <span>Calidad</span>
+          <strong>{calidad}</strong>
+          <small>{historia.resultadoCompletitud ? "Analisis finalizado" : "Todavia sin dictamen"}</small>
+        </div>
+        <div className="result-stat result-stat--sizing">
+          <span>Sizing</span>
+          <strong>{historia.sizingCalculado ?? "-"}</strong>
+          <small>{historia.sizingCalculado ? `${historia.puntosCalculados ?? 0} puntos calculados` : "Bloqueado hasta aprobar calidad"}</small>
+        </div>
+      </Card>
 
-            <div className="review-summary-grid">
-              <div className="review-metric">
-                <div className="metric-label">Estado</div>
-                <div className="metric-value">{historia.estado}</div>
-              </div>
-              <div className="review-metric">
-                <div className="metric-label">Cliente</div>
-                <div className="metric-value">{historia.clienteId}</div>
-              </div>
-              <div className="review-metric">
-                <div className="metric-label">ID</div>
-                <div className="metric-value review-id">{historia.id}</div>
-              </div>
-            </div>
-
-            <div className={`signal-banner signal-banner--${semaforo.tone}`}>
-              <div className="signal-dot" />
-              <div>
-                <strong>{semaforo.titulo}</strong>
-                <span>{semaforo.descripcion}</span>
-              </div>
-            </div>
-
-            <div className="summary-list summary-list--tight">
-              <div className="summary-row">
-                <span>Sizing calculado</span>
-                <strong>{historia.sizingCalculado ?? "Pendiente"}</strong>
-              </div>
-              <div className="summary-row">
-                <span>Puntos</span>
-                <strong>{historia.puntosCalculados ?? "Pendiente"}</strong>
-              </div>
-              <div className="summary-row">
-                <span>Revision tecnica</span>
-                <strong>{formatState(historia.estado)}</strong>
-              </div>
-            </div>
-          </Card>
-
+      <div className="detail-layout">
+        <div className="detail-main">
           <Card>
             <div className="section-heading">
-              <h2>Progreso por etapas</h2>
-              <p>La fase activa queda resaltada. Si el sizing aparece, ya se paso por la compuerta de calidad.</p>
+              <span className="pill pill-blue">Historia de usuario</span>
+              <h2>Contenido evaluado</h2>
             </div>
-            <div className="status-flow">
-              {FLOW_STAGES.map((stage, index) => {
-                const activo = index === pasoActual;
-                const completado = index < pasoActual;
-                return (
-                  <div
-                    key={stage.title}
-                    className="status-step"
-                    data-active={activo ? "true" : "false"}
-                    data-complete={completado ? "true" : "false"}
-                  >
-                    <div className="status-step-header">
-                      <span className="status-step-index">{String(index + 1).padStart(2, "0")}</span>
-                      <strong>{stage.title}</strong>
+            <div className="story-content">
+              <p>{historia.textoOriginal}</p>
+            </div>
+
+            {historia.sugerenciasMejora?.length ? (
+              <div className="improvement-block">
+                <strong>Que conviene mejorar</strong>
+                <div className="improvement-list">
+                  {historia.sugerenciasMejora.map((sugerencia) => (
+                    <div key={sugerencia} className="improvement-item">
+                      <span>!</span>
+                      <p>{sugerencia}</p>
                     </div>
-                    <span>{stage.hint}</span>
-                    <em>{stage.action}</em>
-                  </div>
-                );
-              })}
-            </div>
+                  ))}
+                </div>
+              </div>
+            ) : null}
           </Card>
 
-          <Card>
-            <div className="section-heading">
-              <h2>Historia y evidencia</h2>
-              <p>El texto original y el OCR quedan separados para mantener la trazabilidad.</p>
-            </div>
-            <div className="detail-copy-grid">
-              <div className="detail-copy">
-                <span>Texto original</span>
-                <p>{historia.textoOriginal}</p>
+          {historia.criteriosExtraidos ? (
+            <Card>
+              <div className="section-heading">
+                <span className="pill pill-green">Base del calculo</span>
+                <h2>Criterios extraidos</h2>
+                <p>Estos datos alimentan el motor deterministico; la IA no decide el tamano final.</p>
               </div>
-              {historia.textoOcr ? (
-                <div className="detail-copy">
-                  <span>Texto OCR</span>
-                  <p>{historia.textoOcr}</p>
+              <div className="criteria-grid">
+                <div className="signal-card">
+                  <span>Complejidad tecnica</span>
+                  <strong>{historia.criteriosExtraidos.complejidad_tecnica}</strong>
                 </div>
-              ) : null}
+                <div className="signal-card">
+                  <span>Integraciones</span>
+                  <strong>{historia.criteriosExtraidos.integraciones_detectadas.length}</strong>
+                </div>
+                <div className="signal-card">
+                  <span>Dependencias</span>
+                  <strong>{historia.criteriosExtraidos.dependencias_externas.length}</strong>
+                </div>
+                <div className="signal-card">
+                  <span>Criterios de aceptacion</span>
+                  <strong>{historia.criteriosExtraidos.cantidad_criterios_aceptacion_estimados}</strong>
+                </div>
+              </div>
+            </Card>
+          ) : null}
+
+          <Card>
+            <div className="section-heading section-heading--row">
+              <div>
+                <h2>Recorrido</h2>
+                <p>La etapa activa esta resaltada.</p>
+              </div>
+              <span className="pill pill-blue">{FLOW_STAGES[currentStage].title}</span>
+            </div>
+            <div className="status-track">
+              {FLOW_STAGES.map((stage, index) => (
+                <div key={stage.title} className="status-track-item" data-active={index === currentStage ? "true" : "false"} data-complete={index < currentStage ? "true" : "false"}>
+                  <span>{index < currentStage ? "OK" : String(index + 1).padStart(2, "0")}</span>
+                  <strong>{stage.title}</strong>
+                </div>
+              ))}
             </div>
           </Card>
         </div>
 
-        <aside className="review-side">
-          <Card className="card--accent">
-            <div className="section-heading">
-              <h2>Semaforo de calidad</h2>
-              <p>Este panel resume si la historia ya tiene forma suficiente para seguir el flujo.</p>
-            </div>
-            <div className="signal-grid signal-grid--compact">
-              <div className={`signal-card signal-card--${semaforo.tone}`}>
-                <span>Calidad</span>
-                <strong>{semaforo.titulo}</strong>
-                <p>{semaforo.descripcion}</p>
-              </div>
-              <div className="signal-card">
-                <span>OCR</span>
-                <strong>{historia.textoOcr ? "Disponible" : "Sin OCR"}</strong>
-                <p>{historia.contieneContenidoOcr ? "La historia fue marcada con contenido OCR." : "El OCR no se marco como presente."}</p>
-              </div>
-              <div className="signal-card">
-                <span>Sizing</span>
-                <strong>{historia.sizingCalculado ? `Listo: ${historia.sizingCalculado}` : "Bloqueado"}</strong>
-                <p>{historia.sizingCalculado ? "Ya existe una estimacion calculada." : "Solo se habilita cuando la historia esta completa."}</p>
-              </div>
-              <div className="signal-card">
-                <span>Flujo</span>
-                <strong>{FLOW_STAGES[pasoActual].title}</strong>
-                <p>{FLOW_STAGES[pasoActual].hint}</p>
-              </div>
-            </div>
-          </Card>
-
-          <Card className="card--accent">
-            <div className="section-heading">
-              <h2>Proximo paso</h2>
-              <p>Esto te indica que accion tiene sentido hacer ahora mismo.</p>
-            </div>
-            <div className="callout callout-info">
-              <strong>{pasoSiguiente.title}</strong>
-              <span>{pasoSiguiente.description}</span>
-            </div>
-            <div className="summary-list summary-list--tight">
-              <div className="summary-row">
-                <span>Accion sugerida</span>
-                <strong>{pasoSiguiente.cta}</strong>
-              </div>
-              <div className="summary-row">
-                <span>Acceso rapido</span>
-                <strong>
-                  <a href="#acciones">Ir a acciones</a>
-                </strong>
-              </div>
-            </div>
-          </Card>
-
-          <Card>
+        <aside className="detail-side">
+          <Card className="card--accent detail-actions-card">
             <HistoriaActions historiaId={historia.id} estado={historia.estado} demoMode={demoRequested || !identity} />
           </Card>
 
-          <Card>
+          <Card className="record-meta">
             <div className="section-heading">
-              <h2>Guia rapida</h2>
-              <p>La vista sigue una secuencia simple: calidad, sizing, validacion y cierre.</p>
+              <h2>Datos del registro</h2>
             </div>
-            <div className="summary-list summary-list--tight">
-              <div className="summary-row">
-                <span>Etapa activa</span>
-                <strong>{FLOW_STAGES[pasoActual].title}</strong>
+            <dl>
+              <div>
+                <dt>Cliente</dt>
+                <dd>{historia.clienteId}</dd>
               </div>
-              <div className="summary-row">
-                <span>Calcular</span>
-                <strong>Solo desde COMPLETA</strong>
+              <div>
+                <dt>Identificador</dt>
+                <dd>{historia.id}</dd>
               </div>
-              <div className="summary-row">
-                <span>Validar</span>
-                <strong>Solo lider</strong>
-              </div>
-              <div className="summary-row">
-                <span>Aceptar</span>
-                <strong>Solo cliente propietario</strong>
-              </div>
-            </div>
+            </dl>
           </Card>
         </aside>
       </div>
